@@ -1,0 +1,213 @@
+export default {
+  async fetch(request, env) {
+
+    const url = new URL(request.url);
+
+    // ============================
+    // 🔥 ROTA DE CONSULTA /buscar
+    // ============================
+    if (url.pathname === "/buscar" && request.method === "POST") {
+      try {
+        const form = await request.formData();
+        const matricula = form.get("matricula");
+
+        if (!matricula) {
+          return new Response(
+            JSON.stringify({ error: "Matrícula não enviada" }),
+            { status: 400, headers: { "Content-Type": "application/json" } }
+          );
+        }
+
+        const query = await env.DB
+          .prepare(`SELECT * FROM add_form WHERE matricula = ? ORDER BY enviado_em DESC`)
+          .bind(matricula)
+          .all();
+
+        return new Response(JSON.stringify(query), {
+          status: 200,
+          headers: { "Content-Type": "application/json" }
+        });
+
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" }
+        });
+      }
+    }
+
+    // ============================
+    // 🔧 CORS
+    // ============================
+    const corsHeaders = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    };
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, { status: 204, headers: corsHeaders });
+    }
+
+    if (request.method !== "POST") {
+      return new Response(JSON.stringify({ error: "Method not allowed" }), {
+        status: 405,
+        headers: { "Content-Type": "application/json", ...corsHeaders }
+      });
+    }
+
+    try {
+      const ct = request.headers.get("content-type") || "";
+
+      // ======================================================
+      // 🔹 DECLARAÇÃO DE VARIÁVEIS
+      // ======================================================
+      let nome = "", email = "", mensagem = "";
+      let regional = "", polo = "", matricula = "";
+      let datauso = "", tiporefeicao = "", horario = "";
+      let localidade = "", gps = "", sequencia = "";
+      let osrrss = "", numeroadd = "", observacao = "";
+      let arquivoBase64 = null, arquivoNome = null;
+
+      // ======================================================
+      // 🔍 JSON
+      // ======================================================
+      if (ct.includes("application/json")) {
+        const body = await request.json();
+
+        nome = body.nome || "";
+        email = body.email || "";
+        mensagem = body.mensagem || "";
+
+        regional = body.regional || "";
+        polo = body.polo || "";
+        matricula = body.matricula || "";
+        datauso = body.datauso || "";
+        tiporefeicao = body.tiporefeicao || "";
+        horario = body.horario || "";
+        localidade = body.localidade || "";
+        gps = body.gps || "";
+        sequencia = body.sequencia || "";
+        osrrss = body.osrrss || "";
+        numeroadd = body.numeroadd || "";
+        observacao = body.observacao || "";
+
+        arquivoBase64 = body.arquivoBase64 || null;
+        arquivoNome = body.arquivoNome || null;
+      } else {
+        // ======================================================
+        // 📁 multipart/form-data
+        // ======================================================
+        const form = await request.formData();
+
+        nome = form.get("nome") || "";
+        email = form.get("email") || "";
+        mensagem = form.get("mensagem") || "";
+
+        regional = form.get("regional") || "";
+        polo = form.get("polo") || "";
+        matricula = form.get("matricula") || "";
+        datauso = form.get("datauso") || "";
+        tiporefeicao = form.get("tiporefeicao") || "";
+        horario = form.get("horario") || "";
+        localidade = form.get("localidade") || "";
+        gps = form.get("gps") || form.get("localizacao_gps") || "";
+        sequencia = form.get("sequencia") || "";
+        osrrss = form.get("osrrss") || "";
+        numeroadd = form.get("numeroadd") || "";
+        observacao = form.get("observacao") || "";
+
+        const file = form.get("arquivo");
+        if (file && file.name) {
+          const buffer = await file.arrayBuffer();
+          const bytes = new Uint8Array(buffer);
+
+          let binary = "";
+          for (let i = 0; i < bytes.length; i++) {
+            binary += String.fromCharCode(bytes[i]);
+          }
+
+          arquivoBase64 = btoa(binary);
+          arquivoNome = file.name;
+        }
+      }
+
+      // ======================================================
+      // 💾 GRAVAR NO D1
+      // ======================================================
+      await env.DB.prepare(
+        `INSERT INTO add_form (
+            nome, email, regional, polo, matricula,
+            datauso, tiporefeicao, horario, localidade,
+            gps, sequencia, osrrss, numeroadd, observacao,
+            enviado_em
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      .bind(
+        nome, email, regional, polo, matricula,
+        datauso, tiporefeicao, horario, localidade,
+        gps, sequencia, osrrss, numeroadd, observacao,
+        new Date().toISOString()
+      )
+      .run();
+
+      // ======================================================
+      // ✉ EMAIL
+      // ======================================================
+      const html = `
+        <h2>📌 Novo ADD Recebido</h2>
+        <p><strong>Nome:</strong> ${nome}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Regional:</strong> ${regional}</p>
+        <p><strong>Polo:</strong> ${polo}</p>
+        <p><strong>Matrícula:</strong> ${matricula}</p>
+        <p><strong>Data uso:</strong> ${datauso}</p>
+        <p><strong>Tipo refeição:</strong> ${tiporefeicao}</p>
+        <p><strong>Horário:</strong> ${horario}</p>
+        <p><strong>Localidade:</strong> ${localidade}</p>
+        <p><strong>GPS:</strong> ${gps}</p>
+        <p><strong>Sequência:</strong> ${sequencia}</p>
+        <p><strong>OS/RR/SS:</strong> ${osrrss}</p>
+        <p><strong>Número ADD:</strong> ${numeroadd}</p>
+        <p><strong>Observação:</strong><br>${observacao}</p>
+      `;
+
+      const attachments = [];
+      if (arquivoBase64 && arquivoNome) {
+        attachments.push({ filename: arquivoNome, content: arquivoBase64 });
+      }
+
+      const resp = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${env.RESEND_API_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          from: "ADD <onboarding@resend.dev>",
+          to: ["pedrofillype@gmail.com"],
+          subject: "Novo formulário ADD recebido",
+          html,
+          attachments
+        })
+      });
+
+      const result = await resp.json();
+
+      return new Response(JSON.stringify({
+        ok: true,
+        message: "Salvo no D1 e e-mail enviado",
+        resend: result
+      }, null, 2), {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders }
+      });
+
+    } catch (err) {
+      return new Response(JSON.stringify({ ok: false, error: err.message }), {
+        status: 500,
+        headers: { "Content-Type": "application/json", ...corsHeaders }
+      });
+    }
+  }
+};
