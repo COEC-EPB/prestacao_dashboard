@@ -123,7 +123,7 @@
         const mes = document.getElementById("mes").value;
         const ano = document.getElementById("ano").value;
 
-        const url = `/api/get-registros?matricula=${matricula}&mes=${mes}&ano=${ano}`;
+        const url = `https://long-hall-0aaa.pedro-fillype.workers.dev/get-registros?matricula=${matricula}&mes=${mes}&ano=${ano}`;
 
         const resposta = await fetch(url);
         const dados = await resposta.json();
