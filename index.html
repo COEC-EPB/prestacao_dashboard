@@ -1,221 +1,196 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8" />
-<title>Consulta de Registros ADD</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Registros</title>
 
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 30px;
-  }
-  h1 {
-    color: #222;
-  }
-  label {
-    font-weight: bold;
-  }
-  input, select {
-    padding: 5px;
-    margin: 5px;
-  }
-  button {
-    padding: 6px 12px;
-    cursor: pointer;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-  }
-  th, td {
-    border: 1px solid #ccc;
-    padding: 8px;
-  }
-  th {
-    background: #f0f0f0;
-  }
-</style>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .card {
+            border-radius: 12px;
+        }
+        table thead {
+            background: #0d6efd;
+            color: white;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Consulta de Registros ADD</h1>
+<div class="container">
 
-<!-- ============================
-     BUSCAR POR MATRÍCULA
-     ============================ -->
-<h2>Buscar por Matrícula</h2>
+    <h2 class="text-center mb-4">📊 Consulta de Refeições</h2>
 
-<label>Matrícula:</label>
-<input type="text" id="matricula" placeholder="Digite a matrícula">
-<button onclick="buscarMatricula()">Buscar</button>
+    <!-- 🔎 FILTROS -->
+    <div class="card p-3 mb-4 shadow-sm">
+        <div class="row g-3">
 
-<div id="resultadoMatricula"></div>
+            <div class="col-md-4">
+                <label class="form-label">Pesquisar pela Matrícula:</label>
+                <input type="text" id="matricula" class="form-control" placeholder="Ex: 31313">
+            </div>
 
-<hr>
+            <div class="col-md-3">
+                <label class="form-label">Mês:</label>
+                <select id="mes" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="01">Janeiro</option>
+                    <option value="02">Fevereiro</option>
+                    <option value="03">Março</option>
+                    <option value="04">Abril</option>
+                    <option value="05">Maio</option>
+                    <option value="06">Junho</option>
+                    <option value="07">Julho</option>
+                    <option value="08">Agosto</option>
+                    <option value="09">Setembro</option>
+                    <option value="10">Outubro</option>
+                    <option value="11">Novembro</option>
+                    <option value="12">Dezembro</option>
+                </select>
+            </div>
 
-<!-- ============================
-     ESTATÍSTICAS
-     ============================ -->
-<h2>Estatísticas por Mês</h2>
+            <div class="col-md-3">
+                <label class="form-label">Ano:</label>
+                <select id="ano" class="form-select">
+                    <option value="">Todos</option>
+                </select>
+            </div>
 
-<label>Ano:</label>
-<select id="ano">
-  <option value="">Todos</option>
-</select>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-primary w-100" onclick="buscar()">
+                    Buscar
+                </button>
+            </div>
+        </div>
+    </div>
 
-<label>Mês:</label>
-<select id="mes">
-  <option value="">Todos</option>
-  <option value="01">Janeiro</option>
-  <option value="02">Fevereiro</option>
-  <option value="03">Março</option>
-  <option value="04">Abril</option>
-  <option value="05">Maio</option>
-  <option value="06">Junho</option>
-  <option value="07">Julho</option>
-  <option value="08">Agosto</option>
-  <option value="09">Setembro</option>
-  <option value="10">Outubro</option>
-  <option value="11">Novembro</option>
-  <option value="12">Dezembro</option>
-</select>
+    <!-- 📈 GRÁFICO -->
+    <div class="card p-4 shadow-sm mb-4">
+        <h5 class="mb-3">Quantidade enviada por mês</h5>
+        <canvas id="graficoMes"></canvas>
+    </div>
 
-<button onclick="carregarEstatisticas()">Carregar</button>
+    <!-- 📋 TABELA -->
+    <div class="card p-3 shadow-sm">
+        <h5 class="mb-3">Resultados</h5>
+        <div class="table-responsive">
+            <table class="table table-bordered" id="tabela">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Regional</th>
+                    <th>Polo</th>
+                    <th>Matrícula</th>
+                    <th>Data Uso</th>
+                    <th>Tipo de Refeição</th>
+                    <th>Horário</th>
+                    <th>Localidade</th>
+                    <th>GPS</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
 
-<canvas id="grafico" width="600" height="250"></canvas>
+</div>
 
-<div id="totalMes" style="margin-top:20px; font-weight:bold;"></div>
 
 <script>
-const API = "<https://long-hall-0aaa.pedro-fillype.workers.dev/>";  // <<<<<< ALTERE AQUI!
+    let grafico = null;
 
-// ================================================
-//   BUSCA POR MATRÍCULA
-// ================================================
-async function buscarMatricula() {
-  const matricula = document.getElementById("matricula").value;
-  const div = document.getElementById("resultadoMatricula");
-  div.innerHTML = "Carregando...";
-
-  const resp = await fetch(`${API}/api/buscar?matricula=${matricula}`);
-  const dados = await resp.json();
-
-  if (dados.length === 0) {
-    div.innerHTML = "<p>Nenhum registro encontrado.</p>";
-    return;
-  }
-
-  let html = `
-    <table>
-    <tr>
-      <th>Nome</th>
-      <th>Matrícula</th>
-      <th>Regional</th>
-      <th>Polo</th>
-      <th>Data</th>
-      <th>Horário</th>
-      <th>Tipo</th>
-      <th>Localidade</th>
-      <th>Seq ADD</th>
-      <th>OS/RR/SS</th>
-    </tr>
-  `;
-
-  dados.forEach(l => {
-    html += `
-      <tr>
-        <td>${l.nome}</td>
-        <td>${l.matricula}</td>
-        <td>${l.regional}</td>
-        <td>${l.polo}</td>
-        <td>${l.data_uso}</td>
-        <td>${l.horario}</td>
-        <td>${l.tipo_refeicao}</td>
-        <td>${l.localidade}</td>
-        <td>${l.sequencia_add}</td>
-        <td>${l.os_rr_ss}</td>
-      </tr>
-    `;
-  });
-
-  html += "</table>";
-  div.innerHTML = html;
-}
-
-
-// ============================================
-//   CARREGA ESTATÍSTICAS DO D1
-// ============================================
-let grafico = null;
-
-async function carregarEstatisticas() {
-  const ano = document.getElementById("ano").value;
-  const mes = document.getElementById("mes").value;
-
-  let url = `${API}/api/estatisticas`;
-
-  if (ano && mes) url += `?year=${ano}&month=${mes}`;
-  else if (ano && !mes) url += `?year=${ano}`;
-  else if (!ano && mes) url += `?month=${mes}`;
-
-  const resp = await fetch(url);
-  const dados = await resp.json();
-
-  if (dados.length === 0) {
-    document.getElementById("totalMes").innerHTML = "Nenhum registro.";
-    return;
-  }
-
-  // montar arrays para o gráfico
-  const labels = dados.map(l => `${l.mes}/${l.ano}`);
-  const valores = dados.map(l => l.total);
-
-  // som total
-  const total = valores.reduce((a, b) => a + b, 0);
-  document.getElementById("totalMes").innerHTML = `Total no período: ${total}`;
-
-  // destruir gráfico anterior
-  if (grafico) grafico.destroy();
-
-  grafico = new Chart(document.getElementById("grafico"), {
-    type: "bar",
-    data: {
-      labels: labels,
-      datasets: [{
-        label: "Total de Refeições",
-        data: valores
-      }]
-    },
-    options: {
-      responsive: true,
-      scales: { y: { beginAtZero: true } }
+    // Preenche anos automaticamente
+    const anoSelect = document.getElementById("ano");
+    const anoAtual = new Date().getFullYear();
+    for (let a = anoAtual; a >= anoAtual - 5; a--) {
+        anoSelect.innerHTML += `<option value="${a}">${a}</option>`;
     }
-  });
-}
 
+    async function buscar() {
+        const matricula = document.getElementById("matricula").value;
+        const mes = document.getElementById("mes").value;
+        const ano = document.getElementById("ano").value;
 
-// ============================================
-//      Preencher lista de anos
-// ============================================
-async function carregarAnos() {
-  const resp = await fetch(`${API}/api/estatisticas`);
-  const dados = await resp.json();
+        const url = `/api/get-registros?matricula=${matricula}&mes=${mes}&ano=${ano}`;
 
-  const anos = [...new Set(dados.map(l => l.ano))];
+        const resposta = await fetch(url);
+        const dados = await resposta.json();
 
-  const selectAno = document.getElementById("ano");
-  anos.forEach(a => {
-    const op = document.createElement("option");
-    op.value = a;
-    op.textContent = a;
-    selectAno.appendChild(op);
-  });
-}
+        preencherTabela(dados);
+        atualizarGrafico(dados);
+    }
 
-// iniciar
-carregarAnos();
+    function preencherTabela(dados) {
+        const tabela = document.querySelector("#tabela tbody");
+        tabela.innerHTML = "";
+
+        dados.forEach(item => {
+            tabela.innerHTML += `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.nome}</td>
+                    <td>${item.email}</td>
+                    <td>${item.regional}</td>
+                    <td>${item.polo}</td>
+                    <td>${item.matricula}</td>
+                    <td>${item.datauso}</td>
+                    <td>${item.tiporefeicao}</td>
+                    <td>${item.horario}</td>
+                    <td>${item.localidade}</td>
+                    <td>${item.gps}</td>
+                </tr>
+            `;
+        });
+    }
+
+    function atualizarGrafico(dados) {
+        const contagem = {};
+
+        dados.forEach(item => {
+            if (!item.datauso) return;
+
+            const [ano, mes] = item.datauso.split("-");
+            const chave = `${mes}/${ano}`;
+
+            contagem[chave] = (contagem[chave] || 0) + 1;
+        });
+
+        const labels = Object.keys(contagem);
+        const valores = Object.values(contagem);
+
+        if (grafico) grafico.destroy();
+
+        const ctx = document.getElementById("graficoMes");
+
+        grafico = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels,
+                datasets: [{
+                    label: "Quantidade",
+                    data: valores
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
 </script>
 
 </body>
