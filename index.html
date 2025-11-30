@@ -98,6 +98,9 @@
                     <th>Horário</th>
                     <th>Localidade</th>
                     <th>GPS</th>
+                    <th>Sequência do ADD</th>
+                    <th>Nº OS / RR / SS</th>
+                    <th>Número do ADD</th>
                 </tr>
                 </thead>
                 <tbody></tbody>
@@ -173,42 +176,56 @@
     }
 
     function atualizarGrafico(dados) {
-        const contagem = {};
+    const contagem = {};
 
-        dados.forEach(item => {
-            if (!item.datauso || !item.datauso.includes("-")) return;
+    dados.forEach(item => {
+        if (!item.datauso || !item.datauso.includes("-")) return;
 
-            const [ano, mes] = item.datauso.split("-");
-            const chave = `${mes}/${ano}`;
+        const [ano, mes] = item.datauso.split("-");
+        const chave = `${mes}/${ano}`;
 
-            contagem[chave] = (contagem[chave] || 0) + 1;
-        });
+        contagem[chave] = (contagem[chave] || 0) + 1;
+    });
 
-        const labels = Object.keys(contagem);
-        const valores = Object.values(contagem);
+    // --- ORDENAR POR MÊS E ANO ---
+    let entries = Object.entries(contagem);
 
-        if (grafico) grafico.destroy();
+    entries.sort((a, b) => {
+        const [mesA, anoA] = a[0].split("/");
+        const [mesB, anoB] = b[0].split("/");
 
-        const ctx = document.getElementById("graficoMes");
+        const dataA = new Date(`${anoA}-${mesA}-01`);
+        const dataB = new Date(`${anoB}-${mesB}-01`);
 
-        grafico = new Chart(ctx, {
-            type: "bar",
-            data: {
-                labels,
-                datasets: [{
-                    label: "Quantidade",
-                    data: valores,
-                    backgroundColor: "rgba(13,110,253,0.7)"
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
+        return dataA - dataB;
+    });
+
+    const labels = entries.map(e => e[0]);
+    const valores = entries.map(e => e[1]);
+    // ------------------------------
+
+    if (grafico) grafico.destroy();
+
+    const ctx = document.getElementById("graficoMes");
+
+    grafico = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels,
+            datasets: [{
+                label: "Quantidade",
+                data: valores,
+                backgroundColor: "rgba(13,110,253,0.7)"
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true }
             }
-        });
-    }
+        }
+    });
+}
 </script>
 
 </body>
