@@ -130,14 +130,23 @@ body {
 
 <div class="container">
 
-  <!-- 🔝 TOPO -->
-  <div class="top-actions mb-3">
-    <div class="left-actions">
-      <a href="https://coec-epb.github.io/prestacao_de_contas/" class="btn btn-energisa">⬅️ Voltar</a>
-      <a href="https://coec-epb.github.io/administrador/" class="btn btn-dark">🔐 Administração</a>
+  <!-- TOPO COM VOLTAR + ADMIN + LOGOUT -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div class="d-flex gap-2">
+            <a href="https://coec-epb.github.io/prestacao_de_contas/" 
+               class="btn btn-energisa">
+                ⬅️ Voltar
+            </a>
+
+            <a href="https://coec-epb.github.io/administrador/" 
+               class="btn btn-dark">
+                🔐 Administração
+            </a>
+        </div>
+
+        <button class="btn logout-btn" onclick="logout()">🚪 Sair</button>
     </div>
-    <button class="btn logout-btn" onclick="logout()">🚪 Sair</button>
-  </div>
 
   <div class="header-title">📅 Consulta de Refeições</div>
 
