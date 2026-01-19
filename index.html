@@ -298,7 +298,7 @@ function montarCalendario() {
       const tipos = mapa[d].map(r => r.tiporefeicao);
       const classe = tipos.includes("ALMOCO") && tipos.includes("JANTA") ? "ambos" : tipos.includes("ALMOCO") ? "almoco" : "janta";
 
-      eventos = `<div class="evento ${classe}" onclick="abrirDia(${d})">${classe === "ambos" ? "🍽️ Almoço + 🌙 Janta" : classe === "almoco" ? "🍽️ Almoço" : "🌙 Janta"}</div>`;
+      eventos = `<div class="evento ${classe}" onclick="abrirDia(${d})">${classe === "ambos" ? "🍽️ Almoço + 🌙 Refeição" : classe === "almoco" ? "🍽️ Almoço" : "🌙 Refeição"}</div>`;
     }
 
     cal.innerHTML += `<div class="dia"><div class="dia-num">${d}</div>${eventos}</div>`;
