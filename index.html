@@ -3,11 +3,76 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Consulta de Refeições</title>
+<div class="container">
+
+    <!-- 🔝 TOPO COM VOLTAR + ADMIN + LOGOUT -->
+    <div class="top-actions mb-3">
+
+        <!-- ESQUERDA -->
+        <div class="left-actions">
+            <a href="https://coec-epb.github.io/prestacao_de_contas/"
+               class="btn btn-energisa">
+                ⬅️ Voltar
+            </a>
+
+            <a href="https://coec-epb.github.io/administrador/"
+               class="btn btn-dark">
+                🔐 Administração
+            </a>
+        </div>
+
+        <!-- DIREITA -->
+        <button class="btn logout-btn" onclick="logout()">
+            🚪 Sair
+        </button>
+    </div>
+
+</div>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
+  /* 🔝 TOPO RESPONSIVO */
+.top-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Botões padrão */
+.top-actions a,
+.top-actions button {
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* 📱 MOBILE */
+@media (max-width: 576px) {
+    .top-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .top-actions .left-actions {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .top-actions .left-actions a {
+        flex: 1;
+        font-size: 14px;
+        padding: 12px;
+        text-align: center;
+    }
+
+    .logout-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+    }
+}
 :root {
   --blue: #1a73e8;
   --purple: #9334e6;
