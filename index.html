@@ -94,11 +94,19 @@ body {
    CALENDÁRIO FIXO
 ========================= */
 
+   /* WRAPPER DO CALENDÁRIO */
+.calendario-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+/* GRID DO CALENDÁRIO */
 .calendario {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(90px, 1fr));
   gap: 4px;
-  width: 100%;
+  min-width: 630px; /* 7 dias visíveis */
 }
 
 /* DIA */
@@ -112,16 +120,16 @@ body {
   flex-direction: column;
 }
 
-/* TOPO DO DIA (NÚMERO) */
+/* NÚMERO DO DIA */
 .dia-num {
   font-size: 12px;
   font-weight: 700;
   color: #495057;
-  margin-bottom: 6px;
   text-align: right;
+  margin-bottom: 6px;
 }
 
-/* CONTAINER DE EVENTOS */
+/* EVENTOS */
 .eventos {
   display: flex;
   flex-direction: column;
@@ -130,7 +138,6 @@ body {
   justify-content: center;
 }
 
-/* EVENTO */
 .evento {
   padding: 6px 4px;
   border-radius: 6px;
@@ -138,7 +145,6 @@ body {
   color: #fff;
   text-align: center;
   line-height: 1.2;
-  word-break: break-word;
 }
 
 /* TIPOS */
@@ -150,12 +156,11 @@ body {
 @media (max-width: 576px) {
 
   .calendario {
-    gap: 3px;
+    min-width: 560px; /* força scroll, não corta */
   }
 
   .dia {
     min-height: 85px;
-    padding: 6px;
   }
 
   .dia-num {
@@ -164,7 +169,6 @@ body {
 
   .evento {
     font-size: 11px;
-    padding: 6px 4px;
   }
 }
 
