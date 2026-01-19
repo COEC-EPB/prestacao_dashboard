@@ -9,59 +9,89 @@
 
 <style>
 :root {
-  --energisa-blue: #0097CE;
-  --energisa-blue-dark: #0079a6;
-  --bg-soft: #f5f7fa;
+  --blue: #1a73e8;
+  --purple: #9334e6;
+  --green: #188038;
+  --bg: #f1f3f4;
 }
 
 body {
-  background: var(--bg-soft);
-  padding: 25px;
+  background: var(--bg);
+  padding: 12px;
 }
 
-.card {
-  border-radius: 14px;
-  border: none;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-}
-
+/* ===== HEADER ===== */
 .header-title {
-  background: var(--energisa-blue);
-  padding: 15px;
+  background: var(--blue);
   color: white;
-  border-radius: 12px;
   text-align: center;
-  font-size: 1.6rem;
+  padding: 14px;
+  border-radius: 14px;
   font-weight: bold;
-  margin-bottom: 25px;
+  margin-bottom: 16px;
+  font-size: 1.3rem;
+}
+
+/* ===== CALENDÁRIO ===== */
+.calendario-titulo {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
 .calendario {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
+  gap: 6px;
 }
 
 .dia {
-  padding: 10px;
+  background: white;
   border-radius: 10px;
-  background: #f1f3f5;
-  text-align: center;
-  font-weight: 600;
-  min-height: 80px;
+  min-height: 90px;
+  padding: 6px;
+  position: relative;
+  font-size: 12px;
+}
+
+.dia-num {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  font-size: 12px;
+  font-weight: bold;
+  color: #555;
+}
+
+.evento {
+  margin-top: 20px;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: white;
+  margin-bottom: 4px;
   cursor: pointer;
 }
 
-.dia.registrado {
-  background: var(--energisa-blue);
-  color: white;
-}
+.almoco { background: var(--blue); }
+.janta { background: var(--purple); }
+.ambos { background: var(--green); }
 
-.refeicao {
-  display: block;
-  font-size: 12px;
-  margin-top: 6px;
-  font-weight: normal;
+/* ===== MOBILE ===== */
+@media (max-width: 576px) {
+  .calendario {
+    gap: 5px;
+  }
+
+  .dia {
+    min-height: 75px;
+    padding: 5px;
+  }
+
+  .evento {
+    font-size: 10px;
+  }
 }
 </style>
 </head>
@@ -73,16 +103,16 @@ body {
   <div class="header-title">📅 Consulta de Refeições</div>
 
   <!-- FILTROS -->
-  <div class="card p-3 mb-4">
-    <div class="row g-3">
-      <div class="col-md-4">
+  <div class="card p-3 mb-3">
+    <div class="row g-2">
+      <div class="col-12 col-md-4">
         <label>Matrícula</label>
         <input id="matricula" class="form-control" readonly>
       </div>
-      <div class="col-md-3">
+      <div class="col-6 col-md-3">
         <label>Mês</label>
         <select id="mes" class="form-select">
-          <option value="">Selecione</option>
+          <option value="">Mês</option>
           <option value="01">Janeiro</option>
           <option value="02">Fevereiro</option>
           <option value="03">Março</option>
@@ -97,26 +127,27 @@ body {
           <option value="12">Dezembro</option>
         </select>
       </div>
-      <div class="col-md-3">
+      <div class="col-6 col-md-3">
         <label>Ano</label>
         <select id="ano" class="form-select"></select>
       </div>
-      <div class="col-md-2 d-flex align-items-end">
+      <div class="col-12 col-md-2 d-flex align-items-end">
         <button class="btn btn-primary w-100" onclick="buscar()">Buscar</button>
       </div>
     </div>
   </div>
 
   <!-- CALENDÁRIO -->
-  <div class="card p-4">
+  <div class="card p-3">
+    <div id="tituloMes" class="calendario-titulo"></div>
     <div id="calendario" class="calendario"></div>
   </div>
 
 </div>
 
 <!-- MODAL -->
-<div class="modal fade" id="modalDia" tabindex="-1">
-  <div class="modal-dialog modal-lg">
+<div class="modal fade" id="modalDia">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Detalhes do Dia</h5>
@@ -133,6 +164,11 @@ body {
 const matricula = localStorage.getItem("matricula");
 document.getElementById("matricula").value = matricula;
 
+const mesesNome = [
+  "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+  "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
+];
+
 const anoAtual = new Date().getFullYear();
 const anoSelect = document.getElementById("ano");
 for (let a = anoAtual; a >= anoAtual - 5; a--) {
@@ -144,6 +180,9 @@ let dadosMes = [];
 async function buscar() {
   const mes = document.getElementById("mes").value;
   const ano = document.getElementById("ano").value;
+
+  document.getElementById("tituloMes").innerText =
+    `${mesesNome[mes - 1]} / ${ano}`;
 
   const resp = await fetch(
     `https://long-hall-0aaa.pedro-fillype.workers.dev/buscar?matricula=${matricula}&mes=${mes}&ano=${ano}`
@@ -160,47 +199,52 @@ function montarCalendario() {
   const mes = document.getElementById("mes").value;
   const ano = document.getElementById("ano").value;
 
-  const primeiroDia = new Date(ano, mes - 1, 1);
+  const primeiroDia = new Date(ano, mes - 1, 1).getDay();
   const ultimoDia = new Date(ano, mes, 0).getDate();
 
   const mapa = {};
   dadosMes.forEach(r => {
-    const dia = Number(r.datauso.split("-")[2]);
-    if (!mapa[dia]) mapa[dia] = [];
-    mapa[dia].push(r);
+    const d = Number(r.datauso.split("-")[2]);
+    if (!mapa[d]) mapa[d] = [];
+    mapa[d].push(r);
   });
 
-  for (let i = 0; i < primeiroDia.getDay(); i++) {
+  for (let i = 0; i < primeiroDia; i++) {
     cal.innerHTML += `<div></div>`;
   }
 
   for (let d = 1; d <= ultimoDia; d++) {
+    let eventos = "";
     if (mapa[d]) {
-      const tipos = mapa[d].map(r =>
-        r.tiporefeicao === "ALMOCO" ? "🍽️ Almoço" : "🌙 Janta"
-      ).join("<br>");
+      const tipos = mapa[d].map(r => r.tiporefeicao);
+      const classe =
+        tipos.includes("ALMOCO") && tipos.includes("JANTA") ? "ambos" :
+        tipos.includes("ALMOCO") ? "almoco" : "janta";
 
-      cal.innerHTML += `
-        <div class="dia registrado" onclick="abrirDia(${d})">
-          ${d}
-          <span class="refeicao">${tipos}</span>
-        </div>`;
-    } else {
-      cal.innerHTML += `<div class="dia">${d}</div>`;
+      eventos = `<div class="evento ${classe}" onclick="abrirDia(${d})">
+        ${classe === "ambos" ? "🍽️ Almoço + 🌙 Janta" :
+          classe === "almoco" ? "🍽️ Almoço" : "🌙 Janta"}
+      </div>`;
     }
+
+    cal.innerHTML += `
+      <div class="dia">
+        <div class="dia-num">${d}</div>
+        ${eventos}
+      </div>`;
   }
 }
 
 function abrirDia(dia) {
-  const registros = dadosMes.filter(r =>
+  const lista = dadosMes.filter(r =>
     Number(r.datauso.split("-")[2]) === dia
   );
 
   let html = "";
-  registros.forEach(r => {
+  lista.forEach(r => {
     html += `
       <div class="border rounded p-2 mb-2">
-        <b>${r.tiporefeicao === "ALMOCO" ? "🍽️ Almoço" : "🌙 Janta"}</b><br>
+        <b>${r.tiporefeicao}</b><br>
         Sequência: ${r.sequencia}<br>
         Horário: ${r.horario}<br>
         Localidade: ${r.localidade}<br>
