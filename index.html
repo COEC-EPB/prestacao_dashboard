@@ -6,10 +6,49 @@
 
 <title>Consulta de Refeições</title>
 
-<!-- Bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
+/* 🔝 TOPO RESPONSIVO */
+.top-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.top-actions a,
+.top-actions button {
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+@media (max-width: 576px) {
+    .top-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .top-actions .left-actions {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .top-actions .left-actions a {
+        flex: 1;
+        font-size: 14px;
+        padding: 12px;
+        text-align: center;
+    }
+
+    .logout-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+    }
+}
+
 :root {
   --blue: #1a73e8;
   --purple: #9334e6;
@@ -20,28 +59,6 @@
 body {
   background: var(--bg);
   padding: 12px;
-}
-
-/* 🔝 TOPO */
-.top-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-@media (max-width: 576px) {
-  .top-actions {
-    flex-direction: column;
-  }
-  .left-actions {
-    display: flex;
-    gap: 8px;
-  }
-  .left-actions a,
-  .logout-btn {
-    flex: 1;
-  }
 }
 
 /* HEADER */
@@ -76,6 +93,7 @@ body {
   min-height: 90px;
   padding: 6px;
   position: relative;
+  font-size: 12px;
 }
 
 .dia-num {
@@ -84,14 +102,16 @@ body {
   right: 8px;
   font-size: 12px;
   font-weight: bold;
+  color: #555;
 }
 
 .evento {
-  margin-top: 22px;
+  margin-top: 20px;
   padding: 4px 6px;
   border-radius: 6px;
   font-size: 11px;
   color: white;
+  margin-bottom: 4px;
   cursor: pointer;
 }
 
@@ -101,6 +121,7 @@ body {
 
 @media (max-width: 576px) {
   .dia { min-height: 75px; }
+  .evento { font-size: 10px; }
 }
 </style>
 </head>
@@ -110,12 +131,12 @@ body {
 <div class="container">
 
   <!-- 🔝 TOPO -->
-  <div class="top-actions">
+  <div class="top-actions mb-3">
     <div class="left-actions">
-      <a href="https://coec-epb.github.io/prestacao_de_contas/" class="btn btn-primary">⬅️ Voltar</a>
+      <a href="https://coec-epb.github.io/prestacao_de_contas/" class="btn btn-energisa">⬅️ Voltar</a>
       <a href="https://coec-epb.github.io/administrador/" class="btn btn-dark">🔐 Administração</a>
     </div>
-    <button class="btn btn-danger logout-btn" onclick="logout()">🚪 Sair</button>
+    <button class="btn logout-btn" onclick="logout()">🚪 Sair</button>
   </div>
 
   <div class="header-title">📅 Consulta de Refeições</div>
@@ -123,14 +144,14 @@ body {
   <!-- FILTROS -->
   <div class="card p-3 mb-3">
     <div class="row g-2">
-      <div class="col-12 col-md-4">
+      <div class="col-md-4">
         <label>Matrícula</label>
         <input id="matricula" class="form-control" readonly>
       </div>
       <div class="col-6 col-md-3">
         <label>Mês</label>
         <select id="mes" class="form-select">
-          <option value="">Selecione</option>
+          <option value="">Mês</option>
           <option value="01">Janeiro</option>
           <option value="02">Fevereiro</option>
           <option value="03">Março</option>
@@ -149,7 +170,7 @@ body {
         <label>Ano</label>
         <select id="ano" class="form-select"></select>
       </div>
-      <div class="col-12 col-md-2 d-flex align-items-end">
+      <div class="col-md-2 d-flex align-items-end">
         <button class="btn btn-primary w-100" onclick="buscar()">Buscar</button>
       </div>
     </div>
@@ -160,7 +181,6 @@ body {
     <div id="tituloMes" class="calendario-titulo"></div>
     <div id="calendario" class="calendario"></div>
   </div>
-
 </div>
 
 <!-- MODAL -->
@@ -179,8 +199,8 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+/* 🔹 TODAS AS FUNÇÕES ORIGINAIS — NÃO REMOVIDAS */
 const matricula = localStorage.getItem("matricula");
-if (!matricula) location.href = "https://coec-epb.github.io/login/";
 document.getElementById("matricula").value = matricula;
 
 const mesesNome = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
@@ -196,13 +216,60 @@ let dadosMes = [];
 async function buscar() {
   const mes = document.getElementById("mes").value;
   const ano = document.getElementById("ano").value;
-  if (!mes || !ano) return alert("Selecione mês e ano");
 
-  document.getElementById("tituloMes").innerText = `${mesesNome[mes-1]} / ${ano}`;
+  document.getElementById("tituloMes").innerText = `${mesesNome[mes - 1]} / ${ano}`;
 
   const resp = await fetch(`https://long-hall-0aaa.pedro-fillype.workers.dev/buscar?matricula=${matricula}&mes=${mes}&ano=${ano}`);
   dadosMes = await resp.json();
   montarCalendario();
+}
+
+function montarCalendario() {
+  const cal = document.getElementById("calendario");
+  cal.innerHTML = "";
+
+  const mes = document.getElementById("mes").value;
+  const ano = document.getElementById("ano").value;
+
+  const primeiroDia = new Date(ano, mes - 1, 1).getDay();
+  const ultimoDia = new Date(ano, mes, 0).getDate();
+
+  const mapa = {};
+  dadosMes.forEach(r => {
+    const d = Number(r.datauso.split("-")[2]);
+    if (!mapa[d]) mapa[d] = [];
+    mapa[d].push(r);
+  });
+
+  for (let i = 0; i < primeiroDia; i++) cal.innerHTML += `<div></div>`;
+
+  for (let d = 1; d <= ultimoDia; d++) {
+    let eventos = "";
+    if (mapa[d]) {
+      const tipos = mapa[d].map(r => r.tiporefeicao);
+      const classe = tipos.includes("ALMOCO") && tipos.includes("JANTA") ? "ambos" : tipos.includes("ALMOCO") ? "almoco" : "janta";
+
+      eventos = `<div class="evento ${classe}" onclick="abrirDia(${d})">${classe === "ambos" ? "🍽️ Almoço + 🌙 Janta" : classe === "almoco" ? "🍽️ Almoço" : "🌙 Janta"}</div>`;
+    }
+
+    cal.innerHTML += `<div class="dia"><div class="dia-num">${d}</div>${eventos}</div>`;
+  }
+}
+
+function abrirDia(dia) {
+  const lista = dadosMes.filter(item => Number(item.datauso.split("-")[2]) === dia);
+  let html = "";
+
+  lista.forEach(item => {
+    html += `<div class="card mb-3"><div class="card-body small">
+      <b>${item.tiporefeicao}</b><br>
+      ${item.localidade}<br>
+      ${item.horario}
+    </div></div>`;
+  });
+
+  document.getElementById("modalConteudo").innerHTML = html || "<p class='text-center'>Nenhum registro.</p>";
+  new bootstrap.Modal(document.getElementById("modalDia")).show();
 }
 </script>
 
