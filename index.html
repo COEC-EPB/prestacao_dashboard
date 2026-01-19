@@ -152,6 +152,56 @@ body {
 .janta  { background: var(--purple); }
 .ambos  { background: var(--green); }
 
+   /* =========================
+   CONTAINER GERAL
+========================= */
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 📱 MOBILE — TELA = CALENDÁRIO */
+@media (max-width: 576px) {
+
+  body {
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* remove scroll vertical */
+  }
+
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 6px;
+  }
+
+  .header-title {
+    margin-bottom: 6px;
+    padding: 10px;
+    font-size: 1.1rem;
+    border-radius: 10px;
+  }
+
+  /* CALENDÁRIO OCUPA TUDO */
+  .calendario-wrapper {
+    flex: 1;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .calendario {
+    height: 100%;
+    align-content: stretch;
+  }
+
+  .dia {
+    height: 100%;
+  }
+}
+
 /* 📱 MOBILE */
 @media (max-width: 576px) {
 
