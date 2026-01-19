@@ -257,15 +257,44 @@ function montarCalendario() {
 }
 
 function abrirDia(dia) {
-  const lista = dadosMes.filter(item => Number(item.datauso.split("-")[2]) === dia);
+  const lista = dadosMes.filter(item =>
+    Number(item.datauso.split("-")[2]) === dia
+  );
+
   let html = "";
 
   lista.forEach(item => {
-    html += `<div class="card mb-3"><div class="card-body small">
-      <b>${item.tiporefeicao}</b><br>
-      ${item.localidade}<br>
-      ${item.horario}
-    </div></div>`;
+    html += `
+      <div class="card mb-3 shadow-sm">
+        <div class="card-body p-3">
+
+          <h6 class="fw-bold text-primary mb-2">
+            📅 ${item.datauso} — ${item.tiporefeicao}
+          </h6>
+
+          <div class="row g-2 small">
+            <div class="col-6"><b>ID:</b> ${item.id}</div>
+            <div class="col-6"><b>Matrícula:</b> ${item.matricula}</div>
+
+            <div class="col-12"><b>Nome:</b> ${item.nome}</div>
+            <div class="col-12"><b>Email:</b> ${item.email}</div>
+
+            <div class="col-6"><b>Regional:</b> ${item.regional}</div>
+            <div class="col-6"><b>Polo:</b> ${item.polo}</div>
+
+            <div class="col-6"><b>Horário:</b> ${item.horario}</div>
+            <div class="col-6"><b>Localidade:</b> ${item.localidade}</div>
+
+            <div class="col-12"><b>GPS:</b> ${item.gps}</div>
+
+            <div class="col-4"><b>Sequência:</b> ${item.sequencia || "-"}</div>
+            <div class="col-4"><b>OS/RR/SS:</b> ${item.osrrss || "-"}</div>
+            <div class="col-4"><b>Nº ADD:</b> ${item.numeroadd || "-"}</div>
+          </div>
+
+        </div>
+      </div>
+    `;
   });
 
   document.getElementById("modalConteudo").innerHTML = html || "<p class='text-center'>Nenhum registro.</p>";
