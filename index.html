@@ -11,14 +11,12 @@
 :root {
   --energisa-blue: #0097CE;
   --energisa-blue-dark: #0079a6;
-  --energisa-orange: #F36F21;
   --bg-soft: #f5f7fa;
 }
 
 body {
   background: var(--bg-soft);
   padding: 25px;
-  font-family: Arial, sans-serif;
 }
 
 .card {
@@ -29,7 +27,7 @@ body {
 
 .header-title {
   background: var(--energisa-blue);
-  padding: 15px 20px;
+  padding: 15px;
   color: white;
   border-radius: 12px;
   text-align: center;
@@ -38,20 +36,6 @@ body {
   margin-bottom: 25px;
 }
 
-.btn-energisa {
-  background: var(--energisa-blue);
-  color: white;
-  border-radius: 8px;
-}
-.btn-energisa:hover { background: var(--energisa-blue-dark); }
-
-.logout-btn {
-  background: #dc3545;
-  color: white;
-  border-radius: 8px;
-}
-
-/* 📅 CALENDÁRIO */
 .calendario {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -64,11 +48,8 @@ body {
   background: #f1f3f5;
   text-align: center;
   font-weight: 600;
-  min-height: 70px;
-}
-
-.dia.vazio {
-  background: transparent;
+  min-height: 80px;
+  cursor: pointer;
 }
 
 .dia.registrado {
@@ -76,7 +57,7 @@ body {
   color: white;
 }
 
-.dia .sequencia {
+.refeicao {
   display: block;
   font-size: 12px;
   margin-top: 6px;
@@ -84,21 +65,15 @@ body {
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
 
-  <!-- TOPO -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <a href="https://coec-epb.github.io/prestacao_de_contas/" class="btn btn-energisa">⬅️ Voltar</a>
-    <button class="btn logout-btn" onclick="logout()">🚪 Sair</button>
-  </div>
-
-  <div class="header-title">📊 Consulta de Refeições</div>
+  <div class="header-title">📅 Consulta de Refeições</div>
 
   <!-- FILTROS -->
   <div class="card p-3 mb-4">
-    <h5 class="mb-3">Filtros</h5>
     <div class="row g-3">
       <div class="col-md-4">
         <label>Matrícula</label>
@@ -127,90 +102,114 @@ body {
         <select id="ano" class="form-select"></select>
       </div>
       <div class="col-md-2 d-flex align-items-end">
-        <button class="btn btn-energisa w-100" onclick="buscar()">Buscar</button>
+        <button class="btn btn-primary w-100" onclick="buscar()">Buscar</button>
       </div>
     </div>
   </div>
 
   <!-- CALENDÁRIO -->
   <div class="card p-4">
-    <h5 class="mb-3">📅 Calendário do Mês</h5>
     <div id="calendario" class="calendario"></div>
   </div>
 
 </div>
 
+<!-- MODAL -->
+<div class="modal fade" id="modalDia" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalhes do Dia</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="modalConteudo"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-/* LOGIN */
-const matriculaLogin = localStorage.getItem("matricula");
-if (!matriculaLogin) window.location.href = "https://coec-epb.github.io/login/";
+const matricula = localStorage.getItem("matricula");
+document.getElementById("matricula").value = matricula;
 
-document.getElementById("matricula").value = matriculaLogin;
-
-/* ANOS */
 const anoAtual = new Date().getFullYear();
 const anoSelect = document.getElementById("ano");
 for (let a = anoAtual; a >= anoAtual - 5; a--) {
   anoSelect.innerHTML += `<option value="${a}">${a}</option>`;
 }
 
-/* LOGOUT */
-function logout() {
-  localStorage.clear();
-  window.location.href = "https://coec-epb.github.io/login/";
-}
+let dadosMes = [];
 
-/* BUSCAR */
 async function buscar() {
   const mes = document.getElementById("mes").value;
   const ano = document.getElementById("ano").value;
 
-  if (!mes || !ano) {
-    alert("Selecione mês e ano.");
-    return;
-  }
+  const resp = await fetch(
+    `https://long-hall-0aaa.pedro-fillype.workers.dev/buscar?matricula=${matricula}&mes=${mes}&ano=${ano}`
+  );
 
-  const url = `https://long-hall-0aaa.pedro-fillype.workers.dev/buscar?matricula=${matriculaLogin}&mes=${mes}&ano=${ano}`;
-  const resp = await fetch(url);
-  const dados = await resp.json();
-
-  montarCalendario(dados);
+  dadosMes = await resp.json();
+  montarCalendario();
 }
 
-/* CALENDÁRIO */
-function montarCalendario(dados) {
-  const calendario = document.getElementById("calendario");
-  calendario.innerHTML = "";
+function montarCalendario() {
+  const cal = document.getElementById("calendario");
+  cal.innerHTML = "";
 
   const mes = document.getElementById("mes").value;
   const ano = document.getElementById("ano").value;
 
   const primeiroDia = new Date(ano, mes - 1, 1);
   const ultimoDia = new Date(ano, mes, 0).getDate();
-  const inicioSemana = primeiroDia.getDay();
 
   const mapa = {};
-  dados.forEach(d => {
-    if (!d.datauso) return;
-    const dia = Number(d.datauso.split("-")[2]);
-    mapa[dia] = d.sequencia || "Sem sequência";
+  dadosMes.forEach(r => {
+    const dia = Number(r.datauso.split("-")[2]);
+    if (!mapa[dia]) mapa[dia] = [];
+    mapa[dia].push(r);
   });
 
-  for (let i = 0; i < inicioSemana; i++) {
-    calendario.innerHTML += `<div class="dia vazio"></div>`;
+  for (let i = 0; i < primeiroDia.getDay(); i++) {
+    cal.innerHTML += `<div></div>`;
   }
 
   for (let d = 1; d <= ultimoDia; d++) {
     if (mapa[d]) {
-      calendario.innerHTML += `
-        <div class="dia registrado">
+      const tipos = mapa[d].map(r =>
+        r.tiporefeicao === "ALMOCO" ? "🍽️ Almoço" : "🌙 Janta"
+      ).join("<br>");
+
+      cal.innerHTML += `
+        <div class="dia registrado" onclick="abrirDia(${d})">
           ${d}
-          <span class="sequencia">${mapa[d]}</span>
+          <span class="refeicao">${tipos}</span>
         </div>`;
     } else {
-      calendario.innerHTML += `<div class="dia">${d}</div>`;
+      cal.innerHTML += `<div class="dia">${d}</div>`;
     }
   }
+}
+
+function abrirDia(dia) {
+  const registros = dadosMes.filter(r =>
+    Number(r.datauso.split("-")[2]) === dia
+  );
+
+  let html = "";
+  registros.forEach(r => {
+    html += `
+      <div class="border rounded p-2 mb-2">
+        <b>${r.tiporefeicao === "ALMOCO" ? "🍽️ Almoço" : "🌙 Janta"}</b><br>
+        Sequência: ${r.sequencia}<br>
+        Horário: ${r.horario}<br>
+        Localidade: ${r.localidade}<br>
+        Observação: ${r.observacao || "-"}
+      </div>`;
+  });
+
+  document.getElementById("modalConteudo").innerHTML = html;
+  new bootstrap.Modal(document.getElementById("modalDia")).show();
 }
 </script>
 
