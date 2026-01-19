@@ -248,6 +248,13 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+
+    /* 🔹 LOGOUT (GLOBAL) */
+function logout() {
+  localStorage.clear();
+  sessionStorage.clear();
+  window.location.href = "https://coec-epb.github.io/login/";
+}
 /* 🔹 TODAS AS FUNÇÕES ORIGINAIS — NÃO REMOVIDAS */
 const matricula = localStorage.getItem("matricula");
 document.getElementById("matricula").value = matricula;
