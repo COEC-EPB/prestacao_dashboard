@@ -197,6 +197,13 @@ body {
     justify-content: flex-start;
   }
 }
+  .calendario-titulo {
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  padding: 8px;
+  z-index: 10;
+}
 
 </style>
 </head>
@@ -343,7 +350,14 @@ function montarCalendario() {
       eventos = `<div class="evento ${classe}" onclick="abrirDia(${d})">${classe === "ambos" ? "🍽️ Almoço + 🌙 Refeição" : classe === "almoco" ? "🍽️ Almoço" : "🌙 Refeição"}</div>`;
     }
 
-    cal.innerHTML += `<div class="dia"><div class="dia-num">${d}</div>${eventos}</div>`;
+    cal.innerHTML += `
+  <div class="dia">
+    <div class="dia-num">${d}</div>
+    <div class="dia-eventos">
+      ${eventos || "<span class='text-muted small'>Sem refeições</span>"}
+    </div>
+  </div>
+`;
   }
 }
 
