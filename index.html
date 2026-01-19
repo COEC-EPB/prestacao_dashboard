@@ -113,12 +113,12 @@ body {
   font-size: 1.3rem;
 }
 
-/* CALENDÁRIO */
-.calendario-titulo {
-  text-align: center;
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin-bottom: 10px;
+.calendario {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(110px, 1fr));
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 6px;
 }
 
 .calendario {
