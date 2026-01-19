@@ -91,8 +91,9 @@ body {
 }
 
 /* =========================
-   CALENDÁRIO FIXO (DESKTOP + MOBILE)
-   ========================= */
+   CALENDÁRIO FIXO
+========================= */
+
 .calendario {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -107,103 +108,66 @@ body {
   border-radius: 6px;
   min-height: 90px;
   padding: 6px;
-  position: relative;
-  font-size: 12px;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* DIA ATUAL */
-.dia.hoje {
-  border: 2px solid var(--blue);
-}
-
-/* NÚMERO DO DIA */
+/* TOPO DO DIA (NÚMERO) */
 .dia-num {
-  position: absolute;
-  top: 4px;
-  right: 6px;
-  font-weight: bold;
   font-size: 12px;
+  font-weight: 700;
   color: #495057;
+  margin-bottom: 6px;
+  text-align: right;
+}
+
+/* CONTAINER DE EVENTOS */
+.eventos {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  justify-content: center;
 }
 
 /* EVENTO */
 .evento {
-  margin-top: 18px;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 6px 4px;
+  border-radius: 6px;
   font-size: 11px;
   color: #fff;
   text-align: center;
-  cursor: pointer;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.2;
+  word-break: break-word;
 }
 
 /* TIPOS */
 .almoco { background: var(--blue); }
 .janta  { background: var(--purple); }
-.ambos { background: var(--green); }
+.ambos  { background: var(--green); }
 
-/* =========================
-   MOBILE – COMPACTO, SEM QUEBRAR
-   ========================= */
+/* 📱 MOBILE */
 @media (max-width: 576px) {
 
-  /* BOTÕES */
-  .btn-energisa,
-  .btn-dark,
-  .logout-btn {
-    padding: 12px;
-    font-size: 14px;
-    border-radius: 10px;
-  }
-
-  .top-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .top-actions .left-actions {
-    display: flex;
-    gap: 8px;
-    width: 100%;
-  }
-
-  .top-actions .left-actions a {
-    flex: 1;
-    text-align: center;
-  }
-
-  .logout-btn {
-    width: 100%;
-  }
-
-  /* 📅 CALENDÁRIO */
   .calendario {
     gap: 3px;
   }
 
   .dia {
-    min-height: 85px;          /* usa melhor o quadrado */
+    min-height: 85px;
     padding: 6px;
-    font-size: 11px;
   }
 
   .dia-num {
-    font-size: 12px;           /* dia bem legível */
-    font-weight: 600;
+    font-size: 12px;
   }
 
   .evento {
-    font-size: 10px;           /* legível sem poluir */
-    padding: 5px;
-    margin-top: 20px;          /* centraliza melhor */
-    border-radius: 6px;
-    line-height: 1.2;
+    font-size: 11px;
+    padding: 6px 4px;
   }
 }
+
 </style>
 
 </head>
