@@ -1,301 +1,217 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Consulta de Refeições</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consulta de Refeições</title>
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- SheetJS -->
-    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<style>
+:root {
+  --energisa-blue: #0097CE;
+  --energisa-blue-dark: #0079a6;
+  --energisa-orange: #F36F21;
+  --bg-soft: #f5f7fa;
+}
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+body {
+  background: var(--bg-soft);
+  padding: 25px;
+  font-family: Arial, sans-serif;
+}
 
-    <style>
-        :root {
-            --energisa-blue: #0097CE;
-            --energisa-blue-dark: #0079a6;
-            --energisa-orange: #F36F21;
-            --bg-soft: #f5f7fa;
-        }
+.card {
+  border-radius: 14px;
+  border: none;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
 
-        body {
-            background: var(--bg-soft);
-            padding: 25px;
-            font-family: Arial, sans-serif;
-        }
+.header-title {
+  background: var(--energisa-blue);
+  padding: 15px 20px;
+  color: white;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 25px;
+}
 
-        .card {
-            border-radius: 14px;
-            border: none;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-        }
+.btn-energisa {
+  background: var(--energisa-blue);
+  color: white;
+  border-radius: 8px;
+}
+.btn-energisa:hover { background: var(--energisa-blue-dark); }
 
-        .header-title {
-            background: var(--energisa-blue);
-            padding: 15px 20px;
-            color: white;
-            border-radius: 12px;
-            text-align: center;
-            font-size: 1.6rem;
-            font-weight: bold;
-            margin-bottom: 25px;
-        }
+.logout-btn {
+  background: #dc3545;
+  color: white;
+  border-radius: 8px;
+}
 
-        table thead {
-            background: var(--energisa-blue-dark);
-            color: white;
-        }
+/* 📅 CALENDÁRIO */
+.calendario {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
 
-        .btn-energisa {
-            background: var(--energisa-blue);
-            color: white;
-            border-radius: 8px;
-        }
+.dia {
+  padding: 10px;
+  border-radius: 10px;
+  background: #f1f3f5;
+  text-align: center;
+  font-weight: 600;
+  min-height: 70px;
+}
 
-        .btn-energisa:hover {
-            background: var(--energisa-blue-dark);
-            color: white;
-        }
+.dia.vazio {
+  background: transparent;
+}
 
-        .btn-orange {
-            background: var(--energisa-orange);
-            color: white;
-            border-radius: 8px;
-        }
+.dia.registrado {
+  background: var(--energisa-blue);
+  color: white;
+}
 
-        .btn-orange:hover {
-            background: #d15f1c;
-        }
-
-        .logout-btn {
-            background: #dc3545 !important;
-            color: white;
-            border-radius: 8px;
-        }
-    </style>
+.dia .sequencia {
+  display: block;
+  font-size: 12px;
+  margin-top: 6px;
+  font-weight: normal;
+}
+</style>
 </head>
 <body>
 
 <div class="container">
 
-    <!-- TOPO COM VOLTAR + ADMIN + LOGOUT -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
+  <!-- TOPO -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="https://coec-epb.github.io/prestacao_de_contas/" class="btn btn-energisa">⬅️ Voltar</a>
+    <button class="btn logout-btn" onclick="logout()">🚪 Sair</button>
+  </div>
 
-        <div class="d-flex gap-2">
-            <a href="https://coec-epb.github.io/prestacao_de_contas/" 
-               class="btn btn-energisa">
-                ⬅️ Voltar
-            </a>
+  <div class="header-title">📊 Consulta de Refeições</div>
 
-            <a href="https://coec-epb.github.io/administrador/" 
-               class="btn btn-dark">
-                🔐 Administração
-            </a>
-        </div>
-
-        <button class="btn logout-btn" onclick="logout()">🚪 Sair</button>
+  <!-- FILTROS -->
+  <div class="card p-3 mb-4">
+    <h5 class="mb-3">Filtros</h5>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label>Matrícula</label>
+        <input id="matricula" class="form-control" readonly>
+      </div>
+      <div class="col-md-3">
+        <label>Mês</label>
+        <select id="mes" class="form-select">
+          <option value="">Selecione</option>
+          <option value="01">Janeiro</option>
+          <option value="02">Fevereiro</option>
+          <option value="03">Março</option>
+          <option value="04">Abril</option>
+          <option value="05">Maio</option>
+          <option value="06">Junho</option>
+          <option value="07">Julho</option>
+          <option value="08">Agosto</option>
+          <option value="09">Setembro</option>
+          <option value="10">Outubro</option>
+          <option value="11">Novembro</option>
+          <option value="12">Dezembro</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label>Ano</label>
+        <select id="ano" class="form-select"></select>
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-energisa w-100" onclick="buscar()">Buscar</button>
+      </div>
     </div>
+  </div>
 
-    <div class="header-title">
-        📊 Consulta de Refeições
-    </div>
-
-    <!-- 🔎 FILTROS -->
-    <div class="card p-3 mb-4">
-        <h5 class="mb-3">Filtros da consulta</h5>
-
-        <div class="row g-3">
-
-            <div class="col-md-4">
-                <label class="form-label">Matrícula (bloqueada):</label>
-                <input type="text" id="matricula" class="form-control" readonly>
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label">Mês:</label>
-                <select id="mes" class="form-select">
-                    <option value="">Todos</option>
-                    <option value="01">Janeiro</option>
-                    <option value="02">Fevereiro</option>
-                    <option value="03">Março</option>
-                    <option value="04">Abril</option>
-                    <option value="05">Maio</option>
-                    <option value="06">Junho</option>
-                    <option value="07">Julho</option>
-                    <option value="08">Agosto</option>
-                    <option value="09">Setembro</option>
-                    <option value="10">Outubro</option>
-                    <option value="11">Novembro</option>
-                    <option value="12">Dezembro</option>
-                </select>
-            </div>
-
-            <div class="col-md-3">
-                <label class="form-label">Ano:</label>
-                <select id="ano" class="form-select"></select>
-            </div>
-
-            <div class="col-md-2 d-flex align-items-end">
-                <button class="btn btn-energisa w-100" onclick="buscar()">Buscar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 📈 GRÁFICO -->
-    <div class="card p-4 mb-4">
-        <h5 class="mb-3">📅 Quantidade enviada por mês</h5>
-        <canvas id="graficoMes"></canvas>
-    </div>
-
-    <!-- 📋 TABELA -->
-    <div class="card p-3">
-        <h5 class="mb-3">📋 Resultados encontrados</h5>
-
-        <div class="table-responsive">
-            <table class="table table-bordered" id="tabela">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Email</th>
-                    <th>Regional</th>
-                    <th>Polo</th>
-                    <th>Matrícula</th>
-                    <th>Data Uso</th>
-                    <th>Tipo Refeição</th>
-                    <th>Horário</th>
-                    <th>Localidade</th>
-                    <th>GPS</th>
-                    <th>Sequência</th>
-                    <th>OS/RR/SS</th>
-                    <th>Nº ADD</th>
-                </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
+  <!-- CALENDÁRIO -->
+  <div class="card p-4">
+    <h5 class="mb-3">📅 Calendário do Mês</h5>
+    <div id="calendario" class="calendario"></div>
+  </div>
 
 </div>
 
 <script>
-    let grafico = null;
+/* LOGIN */
+const matriculaLogin = localStorage.getItem("matricula");
+if (!matriculaLogin) window.location.href = "https://coec-epb.github.io/login/";
 
-    /* PEGAR MATRÍCULA DO LOGIN */
-    const matriculaLogin = localStorage.getItem("matricula");
+document.getElementById("matricula").value = matriculaLogin;
 
-    if (!matriculaLogin) {
-        window.location.href = "https://coec-epb.github.io/login/";
+/* ANOS */
+const anoAtual = new Date().getFullYear();
+const anoSelect = document.getElementById("ano");
+for (let a = anoAtual; a >= anoAtual - 5; a--) {
+  anoSelect.innerHTML += `<option value="${a}">${a}</option>`;
+}
+
+/* LOGOUT */
+function logout() {
+  localStorage.clear();
+  window.location.href = "https://coec-epb.github.io/login/";
+}
+
+/* BUSCAR */
+async function buscar() {
+  const mes = document.getElementById("mes").value;
+  const ano = document.getElementById("ano").value;
+
+  if (!mes || !ano) {
+    alert("Selecione mês e ano.");
+    return;
+  }
+
+  const url = `https://long-hall-0aaa.pedro-fillype.workers.dev/buscar?matricula=${matriculaLogin}&mes=${mes}&ano=${ano}`;
+  const resp = await fetch(url);
+  const dados = await resp.json();
+
+  montarCalendario(dados);
+}
+
+/* CALENDÁRIO */
+function montarCalendario(dados) {
+  const calendario = document.getElementById("calendario");
+  calendario.innerHTML = "";
+
+  const mes = document.getElementById("mes").value;
+  const ano = document.getElementById("ano").value;
+
+  const primeiroDia = new Date(ano, mes - 1, 1);
+  const ultimoDia = new Date(ano, mes, 0).getDate();
+  const inicioSemana = primeiroDia.getDay();
+
+  const mapa = {};
+  dados.forEach(d => {
+    if (!d.datauso) return;
+    const dia = Number(d.datauso.split("-")[2]);
+    mapa[dia] = d.sequencia || "Sem sequência";
+  });
+
+  for (let i = 0; i < inicioSemana; i++) {
+    calendario.innerHTML += `<div class="dia vazio"></div>`;
+  }
+
+  for (let d = 1; d <= ultimoDia; d++) {
+    if (mapa[d]) {
+      calendario.innerHTML += `
+        <div class="dia registrado">
+          ${d}
+          <span class="sequencia">${mapa[d]}</span>
+        </div>`;
+    } else {
+      calendario.innerHTML += `<div class="dia">${d}</div>`;
     }
-
-    // Preencher matrícula bloqueada
-    window.onload = () => {
-        document.getElementById("matricula").value = matriculaLogin;
-
-        const anoAtual = new Date().getFullYear();
-        const anoSelect = document.getElementById("ano");
-
-        for (let a = anoAtual; a >= anoAtual - 5; a--) {
-            anoSelect.innerHTML += `<option value="${a}">${a}</option>`;
-        }
-    };
-
-    /* BOTÃO LOGOUT */
-    function logout() {
-        localStorage.removeItem("matricula");
-        window.location.href = "https://coec-epb.github.io/login/";
-    }
-
-    /* BUSCAR DO WORKER */
-    async function buscar() {
-        const matricula = matriculaLogin;
-        const mes = document.getElementById("mes").value;
-        const ano = document.getElementById("ano").value;
-
-        const url = `https://long-hall-0aaa.pedro-fillype.workers.dev/buscar?matricula=${matricula}&mes=${mes}&ano=${ano}`;
-
-        const resposta = await fetch(url);
-        const dados = await resposta.json();
-
-        if (!Array.isArray(dados) || dados.length === 0) {
-            preencherTabela([]);
-            atualizarGrafico([]);
-            alert("Nenhum registro encontrado.");
-            return;
-        }
-
-        preencherTabela(dados);
-        atualizarGrafico(dados);
-    }
-
-    /* TABELA */
-    function preencherTabela(dados) {
-        const tabela = document.querySelector("#tabela tbody");
-        tabela.innerHTML = "";
-
-        dados.forEach(item => {
-            tabela.innerHTML += `
-                <tr>
-                    <td>${item.id}</td>
-                    <td>${item.nome}</td>
-                    <td>${item.email}</td>
-                    <td>${item.regional}</td>
-                    <td>${item.polo}</td>
-                    <td>${item.matricula}</td>
-                    <td>${item.datauso}</td>
-                    <td>${item.tiporefeicao}</td>
-                    <td>${item.horario}</td>
-                    <td>${item.localidade}</td>
-                    <td>${item.gps}</td>
-                    <td>${item.sequencia || ""}</td>
-                    <td>${item.osrrss || ""}</td>
-                    <td>${item.numeroadd || ""}</td>
-                </tr>
-            `;
-        });
-    }
-
-    /* GRÁFICO */
-    function atualizarGrafico(dados) {
-        const contagem = {};
-
-        dados.forEach(item => {
-            if (!item.datauso) return;
-
-            const [ano, mes] = item.datauso.split("-");
-            const key = `${mes}/${ano}`;
-            contagem[key] = (contagem[key] || 0) + 1;
-        });
-
-        const entries = Object.entries(contagem).sort((a, b) => {
-            const [mesA, anoA] = a[0].split("/");
-            const [mesB, anoB] = b[0].split("/");
-
-            return new Date(`${anoA}-${mesA}-01`) - new Date(`${anoB}-${mesB}-01`);
-        });
-
-        const labels = entries.map(e => e[0]);
-        const valores = entries.map(e => e[1]);
-
-        if (grafico) grafico.destroy();
-
-        grafico = new Chart(document.getElementById("graficoMes"), {
-            type: "bar",
-            data: {
-                labels,
-                datasets: [{
-                    label: "Quantidade de registros",
-                    data: valores,
-                    backgroundColor: "rgba(0, 151, 206, .7)"
-                }]
-            },
-            options: { responsive: true }
-        });
-    }
+  }
+}
 </script>
 
 </body>
