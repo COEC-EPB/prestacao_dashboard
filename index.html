@@ -160,6 +160,23 @@ body {
     margin-top: 14px;
   }
 }
+   /* DIA COM REFEIÇÃO */
+.dia.tem-refeicao {
+  background: #e8f0fe;
+  border-color: #1a73e8;
+}
+
+/* EVENTO MAIS VISÍVEL */
+.evento {
+  background: #1a73e8;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* SEM REFEIÇÃO */
+.dia.sem-refeicao {
+  color: #9aa0a6;
+}
 </style>
 
 </head>
@@ -279,6 +296,7 @@ async function buscar() {
 }
 
 function montarCalendario() {
+   
   const cal = document.getElementById("calendario");
   cal.innerHTML = "";
 
@@ -299,11 +317,32 @@ function montarCalendario() {
 
   for (let d = 1; d <= ultimoDia; d++) {
     let eventos = "";
-    if (mapa[d]) {
-      const tipos = mapa[d].map(r => r.tiporefeicao);
-      const classe = tipos.includes("ALMOCO") && tipos.includes("JANTA") ? "ambos" : tipos.includes("ALMOCO") ? "almoco" : "janta";
+let classeDia = "sem-refeicao";
 
-      eventos = `<div class="evento ${classe}" onclick="abrirDia(${d})">${classe === "ambos" ? "🍽️ Almoço + 🌙 Refeição" : classe === "almoco" ? "🍽️ Almoço" : "🌙 Refeição"}</div>`;
+if (mapa[d]) {
+  classeDia = "tem-refeicao";
+
+  const tipos = mapa[d].map(r => r.tiporefeicao);
+  const classe =
+    tipos.includes("ALMOCO") && tipos.includes("JANTA")
+      ? "ambos"
+      : tipos.includes("ALMOCO")
+      ? "almoco"
+      : "janta";
+
+  eventos = `
+    <div class="evento ${classe}" onclick="abrirDia(${d})">
+      🍽️ Refeição
+    </div>
+  `;
+}
+
+cal.innerHTML += `
+  <div class="dia ${classeDia}">
+    <div class="dia-num">${d}</div>
+    ${eventos || "<div class='evento'>Sem refeições</div>"}
+  </div>
+`;
     }
 
     cal.innerHTML += `
