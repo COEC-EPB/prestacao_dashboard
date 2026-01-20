@@ -175,6 +175,10 @@ body {
 
 /* SEM REFEIÇÃO */
 .dia.sem-refeicao {
+  color: #9aa0a6;
+}
+   /* SEM REFEIÇÕES – visual neutro */
+.evento.sem-refeicoes {
   background: #f1f3f4;     /* cinza claro */
   color: #6c757d;          /* texto cinza */
   font-weight: 500;
@@ -338,7 +342,7 @@ function montarCalendario() {
     cal.innerHTML += `
       <div class="dia ${classeDia}">
         <div class="dia-num">${d}</div>
-        ${eventos || "<div class='evento text-muted'>Sem refeições</div>"}
+        ${eventos || "<div class='evento sem-refeicoes'>Sem refeições</div>"}
       </div>
     `;
   }
