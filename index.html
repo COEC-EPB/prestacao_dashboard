@@ -296,7 +296,6 @@ async function buscar() {
 }
 
 function montarCalendario() {
-   
   const cal = document.getElementById("calendario");
   cal.innerHTML = "";
 
@@ -313,47 +312,34 @@ function montarCalendario() {
     mapa[d].push(r);
   });
 
-  for (let i = 0; i < primeiroDia; i++) cal.innerHTML += `<div></div>`;
+  // Espaços antes do dia 1
+  for (let i = 0; i < primeiroDia; i++) {
+    cal.innerHTML += `<div></div>`;
+  }
 
+  // Dias do mês
   for (let d = 1; d <= ultimoDia; d++) {
     let eventos = "";
-let classeDia = "sem-refeicao";
+    let classeDia = "sem-refeicao";
 
-if (mapa[d]) {
-  classeDia = "tem-refeicao";
+    if (mapa[d]) {
+      classeDia = "tem-refeicao";
 
-  const tipos = mapa[d].map(r => r.tiporefeicao);
-  const classe =
-    tipos.includes("ALMOCO") && tipos.includes("JANTA")
-      ? "ambos"
-      : tipos.includes("ALMOCO")
-      ? "almoco"
-      : "janta";
-
-  eventos = `
-    <div class="evento ${classe}" onclick="abrirDia(${d})">
-      🍽️ Refeição
-    </div>
-  `;
-}
-
-cal.innerHTML += `
-  <div class="dia ${classeDia}">
-    <div class="dia-num">${d}</div>
-    ${eventos || "<div class='evento'>Sem refeições</div>"}
-  </div>
-`;
+      eventos = `
+        <div class="evento" onclick="abrirDia(${d})">
+          🍽️ Refeição
+        </div>
+      `;
     }
 
     cal.innerHTML += `
-  <div class="dia">
-    <div class="dia-num">${d}</div>
-    <div class="dia-eventos">
-      ${eventos || "<span class='text-muted small'>Sem refeições</span>"}
-    </div>
-  </div>
-`;
+      <div class="dia ${classeDia}">
+        <div class="dia-num">${d}</div>
+        ${eventos || "<div class='evento text-muted'>Sem refeições</div>"}
+      </div>
+    `;
   }
+}
 
 function abrirDia(dia) {
   const lista = dadosMes.filter(item =>
