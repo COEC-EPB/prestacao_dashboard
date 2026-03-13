@@ -9,9 +9,6 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-/* =========================
-   RESET / BASE
-   ========================= */
 *,
 *::before,
 *::after {
@@ -44,19 +41,6 @@
   background-color: #bb2d3b;
 }
 
-/* 🔝 TOPO */
-.top-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-}
-.top-actions a,
-.top-actions button {
-  border-radius: 8px;
-  font-weight: 600;
-}
-
 /* 🌈 CORES */
 :root {
   --blue: #1a73e8;
@@ -82,17 +66,47 @@ body {
   font-size: 1.3rem;
 }
 
-/* =========================
-   CONTAINER DO CALENDÁRIO
-   ========================= */
+/* RESUMO */
+.resumo-card {
+  border: none;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.08);
+}
+
+.resumo-total {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--purple);
+  line-height: 1;
+}
+
+.resumo-label {
+  font-size: .95rem;
+  color: #6c757d;
+  margin-top: 4px;
+}
+
+.resumo-tipos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.badge-tipo {
+  background: #e9ecef;
+  color: #212529;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: .9rem;
+  font-weight: 600;
+}
+
+/* CALENDÁRIO */
 #calendario {
   max-width: 100%;
   overflow: hidden;
 }
-
-/* =========================
-   CALENDÁRIO RESPONSIVO REAL
-========================= */
 
 .calendario {
   display: grid;
@@ -101,7 +115,6 @@ body {
   width: 100%;
 }
 
-/* DIA */
 .dia {
   background: #fff;
   border: 1px solid #dee2e6;
@@ -113,7 +126,6 @@ body {
   overflow: hidden;
 }
 
-/* NÚMERO */
 .dia-num {
   position: absolute;
   top: 4px;
@@ -123,7 +135,6 @@ body {
   color: #495057;
 }
 
-/* EVENTO */
 .evento {
   margin-top: 16px;
   padding: 4px;
@@ -136,9 +147,7 @@ body {
   text-overflow: ellipsis;
 }
 
-/* 📱 MOBILE */
 @media (max-width: 576px) {
-
   .calendario {
     gap: 2px;
   }
@@ -159,8 +168,18 @@ body {
     padding: 3px;
     margin-top: 14px;
   }
+
+  .resumo-total {
+    font-size: 1.5rem;
+  }
+
+  .badge-tipo {
+    font-size: .82rem;
+    padding: 6px 10px;
+  }
 }
-   /* DIA COM REFEIÇÃO */
+
+/* DIA COM REFEIÇÃO */
 .dia.tem-refeicao {
   background: #e8f0fe;
   border-color: #89109b;
@@ -177,38 +196,35 @@ body {
 .dia.sem-refeicao {
   color: #9aa0a6;
 }
-   /* SEM REFEIÇÕES – visual neutro */
+
+/* SEM REFEIÇÕES – visual neutro */
 .evento.sem-refeicoes {
-  background: #f1f3f4;     /* cinza claro */
-  color: #6c757d;          /* texto cinza */
+  background: #f1f3f4;
+  color: #6c757d;
   font-weight: 500;
   border: 1px dashed #dee2e6;
 }
 </style>
-
 </head>
 
 <body>
 
 <div class="container">
 
-  <!-- TOPO COM VOLTAR + ADMIN + LOGOUT -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
+  <!-- TOPO -->
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div class="d-flex gap-2 flex-wrap">
+      <a href="https://coec-epb.github.io/prestacao_de_contas/" class="btn btn-energisa">
+        ⬅️ Voltar
+      </a>
 
-        <div class="d-flex gap-2">
-            <a href="https://coec-epb.github.io/prestacao_de_contas/" 
-               class="btn btn-energisa">
-                ⬅️ Voltar
-            </a>
-
-            <a href="https://coec-epb.github.io/administrador/" 
-               class="btn btn-dark">
-                🔐 Administração
-            </a>
-        </div>
-
-        <button type="button" class="btn logout-btn" onclick="logout()">🚪 Sair</button>
+      <a href="https://coec-epb.github.io/administrador/" class="btn btn-dark">
+        🔐 Administração
+      </a>
     </div>
+
+    <button type="button" class="btn logout-btn" onclick="logout()">🚪 Sair</button>
+  </div>
 
   <div class="header-title">📅 Consulta de Refeições</div>
 
@@ -247,9 +263,26 @@ body {
     </div>
   </div>
 
+  <!-- RESUMO DO MÊS -->
+  <div class="card p-3 mb-3 resumo-card">
+    <div class="row align-items-center">
+      <div class="col-md-4">
+        <div class="resumo-total" id="totalMes">0</div>
+        <div class="resumo-label">Total de refeições no mês</div>
+      </div>
+
+      <div class="col-md-8">
+        <div class="fw-bold mb-2">Resumo por tipo</div>
+        <div id="resumoTipos" class="resumo-tipos">
+          <span class="badge-tipo">Nenhum dado selecionado</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- CALENDÁRIO -->
   <div class="card p-3">
-    <div id="tituloMes" class="calendario-titulo"></div>
+    <div id="tituloMes" class="calendario-titulo fw-bold mb-3"></div>
     <div id="calendario" class="calendario"></div>
   </div>
 </div>
@@ -270,16 +303,14 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-
-    /* 🔹 LOGOUT (GLOBAL) */
 function logout() {
   localStorage.clear();
   sessionStorage.clear();
   window.location.href = "https://coec-epb.github.io/login/";
 }
-/* 🔹 TODAS AS FUNÇÕES ORIGINAIS — NÃO REMOVIDAS */
+
 const matricula = localStorage.getItem("matricula");
-document.getElementById("matricula").value = matricula;
+document.getElementById("matricula").value = matricula || "";
 
 const mesesNome = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
 
@@ -295,11 +326,60 @@ async function buscar() {
   const mes = document.getElementById("mes").value;
   const ano = document.getElementById("ano").value;
 
-  document.getElementById("tituloMes").innerText = `${mesesNome[mes - 1]} / ${ano}`;
+  if (!mes || !ano) {
+    alert("Selecione o mês e o ano.");
+    return;
+  }
 
-  const resp = await fetch(`https://long-hall-0aaa.pedro-fillype.workers.dev/buscar?matricula=${matricula}&mes=${mes}&ano=${ano}`);
-  dadosMes = await resp.json();
-  montarCalendario();
+  document.getElementById("tituloMes").innerText = `${mesesNome[Number(mes) - 1]} / ${ano}`;
+
+  try {
+    const resp = await fetch(`https://long-hall-0aaa.pedro-fillype.workers.dev/buscar?matricula=${matricula}&mes=${mes}&ano=${ano}`);
+    dadosMes = await resp.json();
+
+    if (!Array.isArray(dadosMes)) {
+      dadosMes = [];
+    }
+
+    atualizarResumo();
+    montarCalendario();
+  } catch (erro) {
+    console.error("Erro ao buscar refeições:", erro);
+    dadosMes = [];
+    atualizarResumo();
+    montarCalendario();
+    alert("Erro ao buscar os dados.");
+  }
+}
+
+function atualizarResumo() {
+  const total = dadosMes.length;
+  document.getElementById("totalMes").innerText = total;
+
+  const resumoTipos = document.getElementById("resumoTipos");
+  resumoTipos.innerHTML = "";
+
+  if (!dadosMes.length) {
+    resumoTipos.innerHTML = `<span class="badge-tipo">Nenhuma refeição encontrada</span>`;
+    return;
+  }
+
+  const contagemPorTipo = {};
+
+  dadosMes.forEach(item => {
+    const tipo = (item.tiporefeicao || "Não informado").trim();
+    contagemPorTipo[tipo] = (contagemPorTipo[tipo] || 0) + 1;
+  });
+
+  Object.entries(contagemPorTipo)
+    .sort((a, b) => b[1] - a[1])
+    .forEach(([tipo, quantidade]) => {
+      resumoTipos.innerHTML += `
+        <span class="badge-tipo">
+          ${tipo}: ${quantidade}
+        </span>
+      `;
+    });
 }
 
 function montarCalendario() {
@@ -308,6 +388,8 @@ function montarCalendario() {
 
   const mes = document.getElementById("mes").value;
   const ano = document.getElementById("ano").value;
+
+  if (!mes || !ano) return;
 
   const primeiroDia = new Date(ano, mes - 1, 1).getDay();
   const ultimoDia = new Date(ano, mes, 0).getDate();
@@ -319,22 +401,21 @@ function montarCalendario() {
     mapa[d].push(r);
   });
 
-  // Espaços antes do dia 1
   for (let i = 0; i < primeiroDia; i++) {
     cal.innerHTML += `<div></div>`;
   }
 
-  // Dias do mês
   for (let d = 1; d <= ultimoDia; d++) {
     let eventos = "";
     let classeDia = "sem-refeicao";
 
     if (mapa[d]) {
       classeDia = "tem-refeicao";
+      const qtdDia = mapa[d].length;
 
       eventos = `
-        <div class="evento" onclick="abrirDia(${d})">
-          🍽️ Refeição
+        <div class="evento" onclick="abrirDia(${d})" title="${qtdDia} refeição(ões)">
+          🍽️ ${qtdDia} refeição(ões)
         </div>
       `;
     }
