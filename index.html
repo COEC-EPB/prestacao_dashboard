@@ -308,6 +308,22 @@ body {
 <script>
 const BASE_URL = "https://long-hall-0aaa.pedro-fillype.workers.dev";
 
+  function json(data, status = 200, corsHeaders = {}) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      ...corsHeaders
+    }
+  });
+}
+  const token = localStorage.getItem("token");
+
+if (!token) {
+  alert("Sessão inválida. Faça login novamente.");
+  window.location.href = "https://coec-epb.github.io/login/";
+}
+
 // ================= LOGOUT =================
 async function logout() {
   const token = localStorage.getItem("token");
@@ -329,6 +345,12 @@ async function logout() {
 async function apiFetch(url, options = {}) {
   const token = localStorage.getItem("token");
 
+  if (!token) {
+    alert("Sessão inválida.");
+    window.location.href = "https://coec-epb.github.io/login/";
+    return null;
+  }
+
   const resp = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`
@@ -337,9 +359,8 @@ async function apiFetch(url, options = {}) {
   });
 
   if (resp.status === 401) {
-    alert("Sessão expirada. Faça login novamente.");
-
     localStorage.clear();
+    alert("Sessão expirada.");
     window.location.href = "https://coec-epb.github.io/login/";
     return null;
   }
