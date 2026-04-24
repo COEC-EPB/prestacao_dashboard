@@ -1,211 +1,64 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
 <title>Consulta de Refeições</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <style>
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
+body {
+  background:#f1f3f4;
+  padding:12px;
 }
-
-/* 🎨 BOTÃO ENERGISA */
-.btn-energisa {
-  background-color: #0057b8;
-  color: #fff;
-  border: none;
+.header-title {
+  background:#1a73e8;
+  color:#fff;
+  text-align:center;
+  padding:14px;
+  border-radius:14px;
+  margin-bottom:16px;
+  font-weight:700;
 }
-.btn-energisa:hover {
-  background-color: #00449a;
-}
-
-/* 🔐 ADMIN */
-.btn-dark {
-  background-color: #212529;
-  color: #fff;
-}
-
-/* 🚪 LOGOUT */
 .logout-btn {
-  background-color: #dc3545;
-  color: #fff;
-  border: none;
+  background:#dc3545;
+  color:#fff;
+  border:none;
 }
 .logout-btn:hover {
-  background-color: #bb2d3b;
+  background:#bb2d3b;
 }
-
-/* 🌈 CORES */
-:root {
-  --blue: #1a73e8;
-  --purple: #9334e6;
-  --green: #188038;
-  --bg: #f1f3f4;
+.evento {
+  background:#89109b;
+  color:#fff;
+  font-size:11px;
+  padding:4px;
+  border-radius:4px;
+  cursor:pointer;
 }
-
-body {
-  background: var(--bg);
-  padding: 12px;
-}
-
-/* HEADER */
-.header-title {
-  background: var(--blue);
-  color: #fff;
-  text-align: center;
-  padding: 14px;
-  border-radius: 14px;
-  font-weight: bold;
-  margin-bottom: 16px;
-  font-size: 1.3rem;
-}
-
-/* RESUMO */
-.resumo-card {
-  border: none;
-  border-radius: 14px;
-  box-shadow: 0 4px 14px rgba(0,0,0,.08);
-}
-
-.resumo-total {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--purple);
-  line-height: 1;
-}
-
-.resumo-label {
-  font-size: .95rem;
-  color: #6c757d;
-  margin-top: 4px;
-}
-
-.resumo-tipos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.badge-tipo {
-  background: #e9ecef;
-  color: #212529;
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-size: .9rem;
-  font-weight: 600;
-}
-
-/* CALENDÁRIO */
-#calendario {
-  max-width: 100%;
-  overflow: hidden;
-}
-
-.calendario {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 4px;
-  width: 100%;
-}
-
 .dia {
-  background: #fff;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  padding: 4px;
-  min-height: 90px;
-  position: relative;
-  font-size: 12px;
-  overflow: hidden;
+  background:#fff;
+  border:1px solid #dee2e6;
+  border-radius:6px;
+  min-height:90px;
+  position:relative;
 }
-
 .dia-num {
-  position: absolute;
-  top: 4px;
-  right: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #495057;
+  position:absolute;
+  top:4px;
+  right:6px;
+  font-size:11px;
+  font-weight:600;
 }
-
-.evento {
-  margin-top: 16px;
-  padding: 4px;
-  border-radius: 4px;
-  font-size: 11px;
-  color: #fff;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-@media (max-width: 576px) {
-  .calendario {
-    gap: 2px;
-  }
-
-  .dia {
-    min-height: 64px;
-    padding: 3px;
-    font-size: 10px;
-    border-radius: 4px;
-  }
-
-  .dia-num {
-    font-size: 10px;
-  }
-
-  .evento {
-    font-size: 9px;
-    padding: 3px;
-    margin-top: 14px;
-  }
-
-  .resumo-total {
-    font-size: 1.5rem;
-  }
-
-  .badge-tipo {
-    font-size: .82rem;
-    padding: 6px 10px;
-  }
-}
-
-/* DIA COM REFEIÇÃO */
-.dia.tem-refeicao {
-  background: #e8f0fe;
-  border-color: #89109b;
-}
-
-/* EVENTO MAIS VISÍVEL */
-.evento {
-  background: #89109b;
-  color: #fff;
-  font-weight: 600;
-}
-
-/* SEM REFEIÇÃO */
-.dia.sem-refeicao {
-  color: #9aa0a6;
-}
-
-/* SEM REFEIÇÕES – visual neutro */
-.evento.sem-refeicoes {
-  background: #f1f3f4;
-  color: #6c757d;
-  font-weight: 500;
-  border: 1px dashed #dee2e6;
+.calendario {
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:4px;
 }
 </style>
 </head>
@@ -214,49 +67,27 @@ body {
 
 <div class="container">
 
-  <!-- TOPO -->
-  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-    <div class="d-flex gap-2 flex-wrap">
-      <a href="https://coec-epb.github.io/prestacao_de_contas/" class="btn btn-energisa">
-        ⬅️ Voltar
-      </a>
-
-      <a href="https://coec-epb.github.io/administrador/" class="btn btn-dark">
-        🔐 Administração
-      </a>
+  <div class="d-flex justify-content-between mb-3">
+    <div class="d-flex gap-2">
+      <a href="https://coec-epb.github.io/prestacao_de_contas/" class="btn btn-primary">⬅️ Voltar</a>
+      <a href="https://coec-epb.github.io/administrador/" class="btn btn-dark">🔐 Administração</a>
     </div>
-
-    <button type="button" class="btn logout-btn" onclick="logout()">🚪 Sair</button>
+    <button class="btn logout-btn" onclick="logout()">🚪 Sair</button>
   </div>
 
   <div class="header-title">📅 Consulta de Refeições</div>
 
-  <!-- FILTROS -->
   <div class="card p-3 mb-3">
     <div class="row g-2">
       <div class="col-md-4">
         <label>Matrícula</label>
         <input id="matricula" class="form-control" readonly>
       </div>
-      <div class="col-6 col-md-3">
+      <div class="col-md-3">
         <label>Mês</label>
-        <select id="mes" class="form-select">
-          <option value="">Mês</option>
-          <option value="01">Janeiro</option>
-          <option value="02">Fevereiro</option>
-          <option value="03">Março</option>
-          <option value="04">Abril</option>
-          <option value="05">Maio</option>
-          <option value="06">Junho</option>
-          <option value="07">Julho</option>
-          <option value="08">Agosto</option>
-          <option value="09">Setembro</option>
-          <option value="10">Outubro</option>
-          <option value="11">Novembro</option>
-          <option value="12">Dezembro</option>
-        </select>
+        <select id="mes" class="form-select"></select>
       </div>
-      <div class="col-6 col-md-3">
+      <div class="col-md-3">
         <label>Ano</label>
         <select id="ano" class="form-select"></select>
       </div>
@@ -266,369 +97,145 @@ body {
     </div>
   </div>
 
-  <!-- RESUMO DO MÊS -->
-  <div class="card p-3 mb-3 resumo-card">
-    <div class="row align-items-center">
-      <div class="col-md-4">
-        <div class="resumo-total" id="totalMes">0</div>
-        <div class="resumo-label">Total de refeições no mês</div>
-      </div>
-
-      <div class="col-md-8">
-        <div class="fw-bold mb-2">Resumo por tipo</div>
-        <div id="resumoTipos" class="resumo-tipos">
-          <span class="badge-tipo">Nenhum dado selecionado</span>
-        </div>
-      </div>
-    </div>
+  <div class="card p-3 mb-3">
+    <div class="fw-bold">Total no mês</div>
+    <div id="totalMes" class="fs-3 fw-bold">0</div>
+    <div id="resumoTipos" class="mt-2"></div>
   </div>
 
-  <!-- CALENDÁRIO -->
   <div class="card p-3">
-    <div id="tituloMes" class="calendario-titulo fw-bold mb-3"></div>
+    <div id="tituloMes" class="fw-bold mb-3"></div>
     <div id="calendario" class="calendario"></div>
-  </div>
-</div>
-
-<!-- MODAL -->
-<div class="modal fade" id="modalDia">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Detalhes do Dia</h5>
-        <button class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body" id="modalConteudo"></div>
-    </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-
-  let memoryToken = null;
-
-function setToken(token) {
-  memoryToken = token;
-
-  try { localStorage.setItem("token", token); } catch {}
-  try { sessionStorage.setItem("token", token); } catch {}
-}
-
-function getToken() {
-  if (memoryToken) return memoryToken;
-
-  try {
-    const t1 = localStorage.getItem("token");
-    if (t1) return t1;
-  } catch {}
-
-  try {
-    const t2 = sessionStorage.getItem("token");
-    if (t2) return t2;
-  } catch {}
-
-  return null;
-}
+/* ================= AUTH BASE ================= */
 const BASE_URL = "https://long-hall-0aaa.pedro-fillype.workers.dev";
+let memoryToken = null;
 
-  function json(data, status = 200, corsHeaders = {}) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-      ...corsHeaders
-    }
-  });
-}
-  const token = localStorage.getItem("token");
-  console.log("ME status:", resp?.status);
-
-if (!token) {
-  alert("Sessão inválida. Faça login novamente.");
-  window.location.href = "https://coec-epb.github.io/login/";
+function getToken(){
+  return memoryToken
+    || localStorage.getItem("token")
+    || sessionStorage.getItem("token");
 }
 
-// ================= LOGOUT =================
-async function logout() {
-  const token = localStorage.getItem("token");
-  console.log("ME status:", resp?.status);
-
-  await fetch(`${BASE_URL}/logout`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  });
-
+function clearSession(){
   localStorage.removeItem("token");
-localStorage.removeItem("usuarioLogado");
+  localStorage.removeItem("usuarioLogado");
+  localStorage.removeItem("matricula");
   sessionStorage.clear();
-
-  window.location.href = "https://coec-epb.github.io/login/";
+  memoryToken = null;
 }
 
-// ================= FETCH PADRÃO =================
-
-function apiFetch(url, options = {}) {
+function apiFetch(url, options = {}){
   const token = getToken();
-
   const headers = new Headers(options.headers || {});
   if (token) headers.set("Authorization", `Bearer ${token}`);
-
-  return fetch(url, {
-    ...options,
-    headers
-  });
+  return fetch(url, { ...options, headers });
 }
 
-// ================= INIT =================
-const matricula = localStorage.getItem("matricula");
-document.getElementById("matricula").value = matricula || "";
-
-const mesesNome = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-
-const anoAtual = new Date().getFullYear();
-const anoSelect = document.getElementById("ano");
-for (let a = anoAtual; a >= anoAtual - 5; a--) {
-  anoSelect.innerHTML += `<option value="${a}">${a}</option>`;
-}
-
-let dadosMes = [];
-
-// ================= BUSCAR =================
-async function buscar() {
-  const mes = document.getElementById("mes").value;
-  const ano = document.getElementById("ano").value;
-  const matricula = document.getElementById("matricula").value.trim(); // 🔥 AQUI
-
-  if (!matricula) {
-    alert("Sessão inválida. Faça login novamente.");
-    window.location.href = "https://coec-epb.github.io/login/";
-    return;
-  }
-
-  if (!mes || !ano) {
-    alert("Selecione o mês e o ano.");
-    return;
-  }
-
-  document.getElementById("tituloMes").innerText =
-    `${mesesNome[Number(mes) - 1]} / ${ano}`;
-
-  try {
-    const resp = await apiFetch(
-      `${BASE_URL}/buscar?matricula=${encodeURIComponent(matricula)}&mes=${mes}&ano=${ano}`
-    );
-
-    if (!resp) return; // 🔥 evita erro quando 401
-
-    const data = await resp.json();
-
-    dadosMes = Array.isArray(data) ? data : [];
-
-    atualizarResumo();
-    montarCalendario();
-
-  } catch (erro) {
-    console.error("Erro ao buscar refeições:", erro);
-    dadosMes = [];
-    atualizarResumo();
-    montarCalendario();
-    alert("Erro ao buscar os dados.");
-  }
-}
-
-// ================= RESUMO =================
-function atualizarResumo() {
-  const total = dadosMes.length;
-  document.getElementById("totalMes").innerText = total;
-
-  const resumoTipos = document.getElementById("resumoTipos");
-  resumoTipos.innerHTML = "";
-
-  if (!dadosMes.length) {
-    resumoTipos.innerHTML = `<span class="badge-tipo">Nenhuma refeição encontrada</span>`;
-    return;
-  }
-
-  const contagem = {};
-
-  dadosMes.forEach(item => {
-    const tipo = (item.tiporefeicao || "Não informado").trim();
-    contagem[tipo] = (contagem[tipo] || 0) + 1;
-  });
-
-  Object.entries(contagem)
-    .sort((a, b) => b[1] - a[1])
-    .forEach(([tipo, quantidade]) => {
-      resumoTipos.innerHTML += `
-        <span class="badge-tipo">${tipo}: ${quantidade}</span>
-      `;
-    });
-}
-
-// ================= CALENDÁRIO =================
-function montarCalendario() {
-  const cal = document.getElementById("calendario");
-  cal.innerHTML = "";
-
-  const mes = document.getElementById("mes").value;
-  const ano = document.getElementById("ano").value;
-
-  if (!mes || !ano) return;
-
-  const primeiroDia = new Date(ano, mes - 1, 1).getDay();
-  const ultimoDia = new Date(ano, mes, 0).getDate();
-
-  const mapa = {};
-
-  dadosMes.forEach(r => {
-    const d = Number(r.datauso.split("-")[2]);
-    if (!mapa[d]) mapa[d] = [];
-    mapa[d].push(r);
-  });
-
-  for (let i = 0; i < primeiroDia; i++) {
-    cal.innerHTML += `<div></div>`;
-  }
-
-  for (let d = 1; d <= ultimoDia; d++) {
-    let eventos = "";
-    let classeDia = "sem-refeicao";
-
-    if (mapa[d]) {
-      classeDia = "tem-refeicao";
-      const qtd = mapa[d].length;
-
-      eventos = `
-        <div class="evento" onclick="abrirDia(${d})" title="${qtd} refeição(ões)">
-          🍽️ ${qtd} refeição(ões)
-        </div>
-      `;
-    }
-
-    cal.innerHTML += `
-      <div class="dia ${classeDia}">
-        <div class="dia-num">${d}</div>
-        ${eventos || "<div class='evento sem-refeicoes'>Sem refeições</div>"}
-      </div>
-    `;
-  }
-}
-
-// ================= MODAL =================
-function abrirDia(dia) {
-  const lista = dadosMes.filter(item =>
-    Number(item.datauso.split("-")[2]) === dia
-  );
-
-  let html = "";
-
-  lista.forEach(item => {
-    html += `
-      <div class="card mb-3 shadow-sm">
-        <div class="card-body p-3">
-          <h6 class="fw-bold text-primary mb-2">
-            📅 ${item.datauso} — ${item.tiporefeicao}
-          </h6>
-
-          <div class="row g-2 small">
-            <div class="col-6"><b>ID:</b> ${item.id}</div>
-            <div class="col-6"><b>Matrícula:</b> ${item.matricula}</div>
-            <div class="col-12"><b>Nome:</b> ${item.nome}</div>
-            <div class="col-12"><b>Email:</b> ${item.email}</div>
-            <div class="col-6"><b>Regional:</b> ${item.regional}</div>
-            <div class="col-6"><b>Polo:</b> ${item.polo}</div>
-            <div class="col-6"><b>Horário:</b> ${item.horario}</div>
-            <div class="col-6"><b>Localidade:</b> ${item.localidade}</div>
-            <div class="col-12"><b>GPS:</b> ${item.gps}</div>
-            <div class="col-4"><b>Sequência:</b> ${item.sequencia || "-"}</div>
-            <div class="col-4"><b>OS/RR/SS:</b> ${item.osrrss || "-"}</div>
-            <div class="col-4"><b>Nº ADD:</b> ${item.numeroadd || "-"}</div>
-          </div>
-        </div>
-      </div>
-    `;
-  });
-
-  document.getElementById("modalConteudo").innerHTML =
-    html || "<p class='text-center'>Nenhum registro.</p>";
-
-  new bootstrap.Modal(document.getElementById("modalDia")).show();
-}
-  window.addEventListener("load", async () => {
-  let matricula = localStorage.getItem("matricula");
-
-  try {
-    // 🔥 sempre valida sessão real no backend
-    const resp = await apiFetch(`${BASE_URL}/me`);
-
-    if (!resp) return;
-
-    const data = await resp.json();
-
-    if (!data.ok || !data.user || !data.user.matricula) {
-      throw new Error("Sessão inválida");
-    }
-
-    // 🔥 garante sincronização total
-    matricula = data.user.matricula;
-
-    localStorage.setItem("matricula", matricula);
-    localStorage.setItem("usuarioLogado", "sim");
-
-    document.getElementById("matricula").value = matricula;
-
-  } catch (err) {
-    console.warn("Usuário não autenticado:", err);
-
-    // 🔥 AQUI É O QUE VOCÊ QUERIA
-    alert("Sessão inválida. Faça login novamente.");
-
-    localStorage.removeItem("token");
-    localStorage.removeItem("usuarioLogado");
-    sessionStorage.clear();
-
-    window.location.href = "https://coec-epb.github.io/login/";
-    return;
-  }
-
-  // 🔥 só continua se estiver autenticado
-  const hoje = new Date();
-  document.getElementById("mes").value = String(hoje.getMonth() + 1).padStart(2, "0");
-  document.getElementById("ano").value = hoje.getFullYear();
-
-  buscar();
-});
-  async function checkAuthOrRedirect() {
+async function checkAuthOrRedirect(){
   const token = getToken();
-  if (!token) {
-    window.location.href = "https://coec-epb.github.io/login/";
-    return false;
+  if (!token){
+    location.href = "https://coec-epb.github.io/login/";
+    return null;
   }
 
   const resp = await apiFetch(`${BASE_URL}/me`);
-  if (!resp || resp.status === 401) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("usuarioLogado");
-    sessionStorage.clear();
-    window.location.href = "https://coec-epb.github.io/login/";
-    return false;
+  if (!resp || resp.status === 401){
+    clearSession();
+    location.href = "https://coec-epb.github.io/login/";
+    return null;
   }
-  return true;
+
+  const data = await resp.json();
+  if (!data.ok || !data.user){
+    clearSession();
+    location.href = "https://coec-epb.github.io/login/";
+    return null;
+  }
+
+  localStorage.setItem("matricula", data.user.matricula);
+  document.getElementById("matricula").value = data.user.matricula;
+
+  return data.user;
 }
 
-window.addEventListener("load", async () => {
-  const ok = await checkAuthOrRedirect();
-  if (!ok) return;
+/* ================= LOGOUT ================= */
+async function logout(){
+  try { await apiFetch(`${BASE_URL}/logout`, { method:"POST" }); } catch {}
+  clearSession();
+  location.href = "https://coec-epb.github.io/login/";
+}
 
-  // segue a página normalmente...
+/* ================= INIT ================= */
+const meses = ["01","02","03","04","05","06","07","08","09","10","11","12"];
+const mesesNome = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const user = await checkAuthOrRedirect();
+  if (!user) return;
+
+  const mesSel = document.getElementById("mes");
+  const anoSel = document.getElementById("ano");
+
+  meses.forEach((m,i)=> {
+    mesSel.innerHTML += `<option value="${m}">${mesesNome[i]}</option>`;
+  });
+
+  const anoAtual = new Date().getFullYear();
+  for (let a = anoAtual; a >= anoAtual-5; a--){
+    anoSel.innerHTML += `<option value="${a}">${a}</option>`;
+  }
+
+  mesSel.value = String(new Date().getMonth()+1).padStart(2,"0");
+  anoSel.value = anoAtual;
+
+  buscar();
 });
 
-  window.TOKEN = getToken();
-</script>
+/* ================= BUSCAR ================= */
+let dadosMes = [];
 
+async function buscar(){
+  const matricula = document.getElementById("matricula").value;
+  const mes = document.getElementById("mes").value;
+  const ano = document.getElementById("ano").value;
+
+  const resp = await apiFetch(`${BASE_URL}/buscar?matricula=${matricula}&mes=${mes}&ano=${ano}`);
+  if (!resp){
+    alert("Erro ao buscar dados");
+    return;
+  }
+
+  dadosMes = await resp.json();
+  document.getElementById("tituloMes").innerText = `${mesesNome[Number(mes)-1]} / ${ano}`;
+
+  atualizarResumo();
+  montarCalendario();
+}
+
+/* ================= RESUMO ================= */
+function atualizarResumo(){
+  document.getElementById("totalMes").innerText = dadosMes.length;
+}
+
+/* ================= CALENDÁRIO ================= */
+function montarCalendario(){
+  const cal = document.getElementById("calendario");
+  cal.innerHTML = "";
+
+  dadosMes.forEach(r => {
+    const d = Number(r.datauso.split("-")[2]);
+    const div = document.createElement("div");
+    div.className = "dia";
+    div.innerHTML = `<div class="dia-num">${d}</div><div class="evento">${r.tiporefeicao}</div>`;
+    cal.appendChild(div);
+  });
+}
+</script>
 </body>
 </html>
