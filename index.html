@@ -502,6 +502,43 @@ function abrirDia(dia) {
 
   new bootstrap.Modal(document.getElementById("modalDia")).show();
 }
+  window.addEventListener("load", async () => {
+  const matricula = localStorage.getItem("matricula");
+
+  // 🔥 se não tiver matrícula → tenta recuperar do backend
+  if (!matricula) {
+    try {
+      const resp = await apiFetch(`${BASE_URL}/me`);
+
+      if (!resp) return;
+
+      const data = await resp.json();
+
+      if (data.ok && data.user) {
+        // 🔥 restaura sessão
+        localStorage.setItem("matricula", data.user.matricula);
+        localStorage.setItem("usuarioLogado", "sim");
+
+        document.getElementById("matricula").value = data.user.matricula;
+
+      } else {
+        throw new Error();
+      }
+
+    } catch {
+      // 🔥 não autenticado de verdade
+      window.location.href = "https://coec-epb.github.io/login/";
+      return;
+    }
+  }
+
+  // 🔥 auto carregar mês atual
+  const hoje = new Date();
+  document.getElementById("mes").value = String(hoje.getMonth()+1).padStart(2,"0");
+  document.getElementById("ano").value = hoje.getFullYear();
+
+  buscar();
+});
 </script>
 
 </body>
