@@ -308,7 +308,19 @@ function logout() {
   sessionStorage.clear();
   window.location.href = "https://coec-epb.github.io/login/";
 }
+  
+function apiFetch(url, options = {}) {
+  const token = localStorage.getItem("token");
 
+  return fetch(url, {
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      ...(options.headers || {})
+    },
+    ...options
+  });
+}
+  
 const matricula = localStorage.getItem("matricula");
 document.getElementById("matricula").value = matricula || "";
 
@@ -334,7 +346,9 @@ async function buscar() {
   document.getElementById("tituloMes").innerText = `${mesesNome[Number(mes) - 1]} / ${ano}`;
 
   try {
-    const resp = await fetch(`https://long-hall-0aaa.pedro-fillype.workers.dev/buscar?matricula=${matricula}&mes=${mes}&ano=${ano}`);
+const resp = await apiFetch(
+  `https://long-hall-0aaa.pedro-fillype.workers.dev/buscar?matricula=${matricula}&mes=${mes}&ano=${ano}`
+);
     dadosMes = await resp.json();
 
     if (!Array.isArray(dadosMes)) {
