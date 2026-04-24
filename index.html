@@ -310,13 +310,8 @@ function logout() {
 }
   
 function apiFetch(url, options = {}) {
-  const token = localStorage.getItem("token");
-
   return fetch(url, {
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      ...(options.headers || {})
-    },
+    credentials: "include", // 🔥 ESSENCIAL
     ...options
   });
 }
