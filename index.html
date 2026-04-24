@@ -335,7 +335,8 @@ async function logout() {
     }
   });
 
-  localStorage.clear();
+  localStorage.removeItem("token");
+localStorage.removeItem("usuarioLogado");
   sessionStorage.clear();
 
   window.location.href = "https://coec-epb.github.io/login/";
@@ -573,7 +574,8 @@ function abrirDia(dia) {
     // 🔥 AQUI É O QUE VOCÊ QUERIA
     alert("Sessão inválida. Faça login novamente.");
 
-    localStorage.clear();
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuarioLogado");
     sessionStorage.clear();
 
     window.location.href = "https://coec-epb.github.io/login/";
