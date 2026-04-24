@@ -343,6 +343,7 @@ const BASE_URL = "https://long-hall-0aaa.pedro-fillype.workers.dev";
   });
 }
   const token = localStorage.getItem("token");
+  console.log("ME status:", resp?.status);
 
 if (!token) {
   alert("Sessão inválida. Faça login novamente.");
@@ -352,6 +353,7 @@ if (!token) {
 // ================= LOGOUT =================
 async function logout() {
   const token = localStorage.getItem("token");
+  console.log("ME status:", resp?.status);
 
   await fetch(`${BASE_URL}/logout`, {
     method: "POST",
@@ -368,16 +370,19 @@ localStorage.removeItem("usuarioLogado");
 }
 
 // ================= FETCH PADRÃO =================
+
 function apiFetch(url, options = {}) {
   const token = getToken();
 
+  const headers = new Headers(options.headers || {});
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+
   return fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`
-    },
-    ...options
+    ...options,
+    headers
   });
 }
+
 // ================= INIT =================
 const matricula = localStorage.getItem("matricula");
 document.getElementById("matricula").value = matricula || "";
@@ -597,14 +602,31 @@ function abrirDia(dia) {
 
   buscar();
 });
-  window.addEventListener("load", () => {
+  async function checkAuthOrRedirect() {
   const token = getToken();
-
   if (!token) {
-    alert("Sessão inválida. Faça login novamente.");
     window.location.href = "https://coec-epb.github.io/login/";
+    return false;
   }
+
+  const resp = await apiFetch(`${BASE_URL}/me`);
+  if (!resp || resp.status === 401) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuarioLogado");
+    sessionStorage.clear();
+    window.location.href = "https://coec-epb.github.io/login/";
+    return false;
+  }
+  return true;
+}
+
+window.addEventListener("load", async () => {
+  const ok = await checkAuthOrRedirect();
+  if (!ok) return;
+
+  // segue a página normalmente...
 });
+
   window.TOKEN = getToken();
 </script>
 
