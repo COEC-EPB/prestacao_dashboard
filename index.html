@@ -320,20 +320,17 @@ async function apiFetch(url, options = {}) {
 
   const resp = await fetch(url, {
     headers: {
-      "Authorization": `Bearer ${token}`,
-      ...(options.headers || {})
+      Authorization: `Bearer ${token}`
     },
     ...options
   });
 
   if (resp.status === 401) {
-    // 🔥 limpa tudo
     localStorage.clear();
     sessionStorage.clear();
 
     alert("Sessão expirada. Faça login novamente.");
     window.location.href = "https://coec-epb.github.io/login/";
-
     return;
   }
 
