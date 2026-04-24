@@ -355,18 +355,28 @@ let dadosMes = [];
 async function buscar() {
   const mes = document.getElementById("mes").value;
   const ano = document.getElementById("ano").value;
+  const matricula = document.getElementById("matricula").value.trim(); // 🔥 AQUI
+
+  if (!matricula) {
+    alert("Sessão inválida. Faça login novamente.");
+    window.location.href = "https://coec-epb.github.io/login/";
+    return;
+  }
 
   if (!mes || !ano) {
     alert("Selecione o mês e o ano.");
     return;
   }
 
-  document.getElementById("tituloMes").innerText = `${mesesNome[Number(mes) - 1]} / ${ano}`;
+  document.getElementById("tituloMes").innerText =
+    `${mesesNome[Number(mes) - 1]} / ${ano}`;
 
   try {
     const resp = await apiFetch(
-      `${BASE_URL}/buscar?matricula=${matricula}&mes=${mes}&ano=${ano}`
+      `${BASE_URL}/buscar?matricula=${encodeURIComponent(matricula)}&mes=${mes}&ano=${ano}`
     );
+
+    if (!resp) return; // 🔥 evita erro quando 401
 
     const data = await resp.json();
 
