@@ -310,9 +310,13 @@ const BASE_URL = "https://long-hall-0aaa.pedro-fillype.workers.dev";
 
 // ================= LOGOUT =================
 async function logout() {
+  const token = localStorage.getItem("token");
+
   await fetch(`${BASE_URL}/logout`, {
     method: "POST",
-    credentials: "include"
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
   });
 
   localStorage.clear();
@@ -322,15 +326,25 @@ async function logout() {
 }
 
 // ================= FETCH PADRÃO =================
-function apiFetch(url, options = {}) {
+async function apiFetch(url, options = {}) {
   const token = localStorage.getItem("token");
 
-  return fetch(url, {
+  const resp = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`
     },
     ...options
   });
+
+  if (resp.status === 401) {
+    alert("Sessão expirada. Faça login novamente.");
+
+    localStorage.clear();
+    window.location.href = "https://coec-epb.github.io/login/";
+    return null;
+  }
+
+  return resp;
 }
 // ================= INIT =================
 const matricula = localStorage.getItem("matricula");
@@ -549,15 +563,6 @@ function abrirDia(dia) {
   document.getElementById("ano").value = hoje.getFullYear();
 
   buscar();
-});
-
-  window.addEventListener("load", async () => {
-  const status = await fetch(
-    "https://long-hall-0aaa.pedro-fillype.workers.dev/me",
-    { credentials: "include" }
-  ).then(r => r.status);
-
-  alert("Status /me: " + status);
 });
 </script>
 
