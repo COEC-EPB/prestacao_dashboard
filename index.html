@@ -205,7 +205,7 @@ async function buscar(){
   const mes = document.getElementById("mes").value;
   const ano = document.getElementById("ano").value;
 
-  const resp = await apiFetch(`${BASE_URL}/buscar?matricula=${matricula}&mes=${mes}&ano=${ano}`);
+  const resp = await apiFetch(${BASE_URL}/buscar?matricula=${...}&mes=${mes}&ano=${ano}`);
   if (!resp){
     alert("Erro ao buscar dados");
     return;
