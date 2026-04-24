@@ -316,19 +316,24 @@ async function logout() {
 }
   
 async function apiFetch(url, options = {}) {
+  const token = localStorage.getItem("token");
+
   const resp = await fetch(url, {
-    credentials: "include",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      ...(options.headers || {})
+    },
     ...options
   });
 
   if (resp.status === 401) {
-    // 🔥 limpa sessão quebrada
+    // 🔥 limpa tudo
     localStorage.clear();
     sessionStorage.clear();
 
     alert("Sessão expirada. Faça login novamente.");
-
     window.location.href = "https://coec-epb.github.io/login/";
+
     return;
   }
 
@@ -409,6 +414,8 @@ function atualizarResumo() {
       `;
     });
 }
+
+  
 
 function montarCalendario() {
   const cal = document.getElementById("calendario");
