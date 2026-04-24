@@ -306,6 +306,31 @@ body {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+
+  let memoryToken = null;
+
+function setToken(token) {
+  memoryToken = token;
+
+  try { localStorage.setItem("token", token); } catch {}
+  try { sessionStorage.setItem("token", token); } catch {}
+}
+
+function getToken() {
+  if (memoryToken) return memoryToken;
+
+  try {
+    const t1 = localStorage.getItem("token");
+    if (t1) return t1;
+  } catch {}
+
+  try {
+    const t2 = sessionStorage.getItem("token");
+    if (t2) return t2;
+  } catch {}
+
+  return null;
+}
 const BASE_URL = "https://long-hall-0aaa.pedro-fillype.workers.dev";
 
   function json(data, status = 200, corsHeaders = {}) {
@@ -343,32 +368,15 @@ localStorage.removeItem("usuarioLogado");
 }
 
 // ================= FETCH PADRÃO =================
-async function apiFetch(url, options = {}) {
-  const token = localStorage.getItem("token");
+function apiFetch(url, options = {}) {
+  const token = getToken();
 
-  if (!token) {
-    window.location.href = "https://coec-epb.github.io/login/";
-    return null;
-  }
-
-  const resp = await fetch(url, {
+  return fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`
     },
     ...options
   });
-
-  if (resp.status === 401) {
-    alert("Sessão expirada.");
-
-    // 🔥 NÃO usa clear
-    localStorage.removeItem("token");
-
-    window.location.href = "https://coec-epb.github.io/login/";
-    return null;
-  }
-
-  return resp;
 }
 // ================= INIT =================
 const matricula = localStorage.getItem("matricula");
@@ -589,6 +597,15 @@ function abrirDia(dia) {
 
   buscar();
 });
+  window.addEventListener("load", () => {
+  const token = getToken();
+
+  if (!token) {
+    alert("Sessão inválida. Faça login novamente.");
+    window.location.href = "https://coec-epb.github.io/login/";
+  }
+});
+  window.TOKEN = getToken();
 </script>
 
 </body>
