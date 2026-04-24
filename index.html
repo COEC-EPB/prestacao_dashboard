@@ -513,38 +513,44 @@ function abrirDia(dia) {
   new bootstrap.Modal(document.getElementById("modalDia")).show();
 }
   window.addEventListener("load", async () => {
-  const matricula = localStorage.getItem("matricula");
+  let matricula = localStorage.getItem("matricula");
 
-  // 🔥 se não tiver matrícula → tenta recuperar do backend
-  if (!matricula) {
-    try {
-      const resp = await apiFetch(`${BASE_URL}/me`);
+  try {
+    // 🔥 sempre valida sessão real no backend
+    const resp = await apiFetch(`${BASE_URL}/me`);
 
-      if (!resp) return;
+    if (!resp) return;
 
-      const data = await resp.json();
+    const data = await resp.json();
 
-      if (data.ok && data.user) {
-        // 🔥 restaura sessão
-        localStorage.setItem("matricula", data.user.matricula);
-        localStorage.setItem("usuarioLogado", "sim");
-
-        document.getElementById("matricula").value = data.user.matricula;
-
-      } else {
-        throw new Error();
-      }
-
-    } catch {
-      // 🔥 não autenticado de verdade
-      window.location.href = "https://coec-epb.github.io/login/";
-      return;
+    if (!data.ok || !data.user || !data.user.matricula) {
+      throw new Error("Sessão inválida");
     }
+
+    // 🔥 garante sincronização total
+    matricula = data.user.matricula;
+
+    localStorage.setItem("matricula", matricula);
+    localStorage.setItem("usuarioLogado", "sim");
+
+    document.getElementById("matricula").value = matricula;
+
+  } catch (err) {
+    console.warn("Usuário não autenticado:", err);
+
+    // 🔥 AQUI É O QUE VOCÊ QUERIA
+    alert("Sessão inválida. Faça login novamente.");
+
+    localStorage.clear();
+    sessionStorage.clear();
+
+    window.location.href = "https://coec-epb.github.io/login/";
+    return;
   }
 
-  // 🔥 auto carregar mês atual
+  // 🔥 só continua se estiver autenticado
   const hoje = new Date();
-  document.getElementById("mes").value = String(hoje.getMonth()+1).padStart(2,"0");
+  document.getElementById("mes").value = String(hoje.getMonth() + 1).padStart(2, "0");
   document.getElementById("ano").value = hoje.getFullYear();
 
   buscar();
