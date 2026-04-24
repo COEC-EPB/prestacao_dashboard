@@ -571,6 +571,15 @@ function abrirDia(dia) {
 
   buscar();
 });
+
+  window.addEventListener("load", async () => {
+  const status = await fetch(
+    "https://long-hall-0aaa.pedro-fillype.workers.dev/me",
+    { credentials: "include" }
+  ).then(r => r.status);
+
+  alert("Status /me: " + status);
+});
 </script>
 
 </body>
